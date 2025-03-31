@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">zark</string>
+    <string name="login">Login</string>
+    <string name="signin">Signin</string>
 </resources>
