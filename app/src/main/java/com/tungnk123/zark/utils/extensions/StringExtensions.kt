@@ -8,7 +8,7 @@ enum class LogLevel {
     VERBOSE, DEBUG, INFO, WARN, ERROR
 }
 
-fun String.printLog(tag: String = "Orpheus_Log", logLevel: LogLevel = LogLevel.DEBUG) {
+fun String.printLog(tag: String = "Zark_Log", logLevel: LogLevel = LogLevel.DEBUG) {
     when (logLevel) {
         LogLevel.VERBOSE -> Log.v(tag, this)
         LogLevel.DEBUG -> Log.d(tag, this)
