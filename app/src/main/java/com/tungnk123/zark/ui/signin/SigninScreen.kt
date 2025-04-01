@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.tungnk123.zark.ui.navigation.NavigationBarMetadataItem
 
 @Composable
@@ -26,7 +25,7 @@ fun SigninScreen(
         ) {
             Text(text = "Signin screen")
             Button(onClick = {
-                navController.navigate(NavigationBarMetadataItem.Login.route.route)
+                navController.navigate(NavigationBarMetadataItem.Login.navigationRoute.route)
             }) {
                 Text("Login in")
             }

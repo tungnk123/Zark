@@ -38,25 +38,25 @@ fun BottomNavigationBar(
         Spacer(modifier = Modifier.width(2.dp))
 
         tabItemsList.forEach { tab ->
-            val isSelected = currentTab.route == tab.route
+            val isSelected = currentTab.navigationRoute == tab.navigationRoute
 
             NavigationBarItem(
                 selected = isSelected,
                 alwaysShowLabel = true,
                 icon = {
                     Crossfade(
-                        label = "bottom-bar-${tab.route}",
+                        label = "bottom-bar-${tab.navigationRoute}",
                         targetState = isSelected
                     ) {
                         Icon(
                             imageVector = if (it) tab.selectedIcon else tab.unselectedIcon,
-                            contentDescription = tab.route.route
+                            contentDescription = tab.navigationRoute.route
                         )
                     }
                 },
                 label = {
                     Text(
-                        text = tab.route.name,
+                        text = tab.navigationRoute.name,
                         style = MaterialTheme.typography.labelSmall,
                         textAlign = TextAlign.Center,
                         overflow = TextOverflow.Ellipsis,
