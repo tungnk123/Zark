@@ -1,4 +1,4 @@
-package com.tungnk123.zark.ui.login
+package com.tungnk123.zark.ui.signin
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -33,18 +33,20 @@ import androidx.navigation.NavController
 import com.tungnk123.zark.R
 import com.tungnk123.zark.ui.common.CustomTextField
 import com.tungnk123.zark.ui.common.PrimaryButton
+import com.tungnk123.zark.ui.common.TermsAndPrivacyText
 import com.tungnk123.zark.ui.navigation.NavigationBarMetadataItem
 import com.tungnk123.zark.ui.theme.c_4A86F7
 import com.tungnk123.zark.ui.theme.c_6A7185
 
 @Composable
-fun LoginScreen(
+fun SignInScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
-    loginViewModel: LoginViewModel = hiltViewModel()
+    signInViewModel: SignInViewModel = hiltViewModel()
 ) {
     var phone by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -66,15 +68,15 @@ fun LoginScreen(
                     .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(71.dp))
+                Spacer(modifier = Modifier.height(24.dp))
                 Image(
                     painter = painterResource(R.drawable.ic_logo),
                     modifier = Modifier.size(92.dp),
                     contentDescription = null
                 )
-                Spacer(modifier = Modifier.height(60.dp))
+                Spacer(modifier = Modifier.height(32.dp))
                 Text(
-                    text = stringResource(R.string.msg_login_title),
+                    text = stringResource(R.string.msg_sign_in_account),
                     style = MaterialTheme.typography.titleLarge.copy(
                         color = Color.Black,
                         fontSize = 20.sp
@@ -82,7 +84,7 @@ fun LoginScreen(
                 )
                 Spacer(modifier = Modifier.height(7.dp))
                 Text(
-                    text = stringResource(R.string.msg_login_subtitle),
+                    text = stringResource(R.string.msg_who_are_you),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         color = c_6A7185,
                         fontSize = 13.sp
@@ -111,42 +113,46 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(9.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    text = stringResource(R.string.msg_forget_password),
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        color = c_4A86F7,
-                        fontSize = 13.sp,
-                    ),
-                    textAlign = TextAlign.End,
+                CustomTextField(
+                    value = confirmPassword,
+                    onValueChange = { confirmPassword = it },
+                    labelResId = R.string.msg_confirm_password,
+                    leadIconResId = R.drawable.ic_lock,
+                    isPasswordField = true,
+                    trailingIconResId = R.drawable.ic_eye,
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(18.dp))
 
                 PrimaryButton(
-                    textResId = R.string.msg_login,
+                    textResId = R.string.msg_continue,
                     onClick = {}
                 )
 
+                Spacer(modifier = Modifier.height(18.dp))
+                TermsAndPrivacyText()
                 Spacer(modifier = Modifier.height(18.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = stringResource(R.string.msg_no_account),
+                        text = stringResource(R.string.msg_already_have_account),
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = c_6A7185
+                            color = c_6A7185,
+                            fontSize = 13.sp
                         )
                     )
                     TextButton(onClick = {
-                        navController.navigate(NavigationBarMetadataItem.Signin.navigationRoute.route)
+                        navController.navigate(NavigationBarMetadataItem.Login.navigationRoute.route)
                     }) {
                         Text(
-                            text = stringResource(R.string.msg_signin_now),
+                            text = stringResource(R.string.msg_login_now),
                             style = MaterialTheme.typography.bodyMedium.copy(
-                                color = c_4A86F7
+                                color = c_4A86F7,
+                                fontSize = 13.sp
                             )
                         )
                     }

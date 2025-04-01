@@ -12,18 +12,18 @@ enum class NavigationBarMetadataItem(
     val labelResId: Int,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector,
-    val route: NavigationRoute
+    val navigationRoute: NavigationRoute
 ) {
     Login(
         labelResId = R.string.login,
         selectedIcon = Icons.Filled.Face,
         unselectedIcon = Icons.Outlined.Face,
-        route = NavigationRoute.Login
+        navigationRoute = NavigationRoute.Login
     ),
     Signin(
         labelResId = R.string.signin,
         selectedIcon = Icons.Filled.MusicNote,
         unselectedIcon = Icons.Outlined.MusicNote,
-        route = NavigationRoute.Signin
+        navigationRoute = NavigationRoute.Signin
     ),
 }
