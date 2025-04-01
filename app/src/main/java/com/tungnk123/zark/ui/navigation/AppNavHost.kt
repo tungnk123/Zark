@@ -5,7 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.tungnk123.zark.ui.login.LoginScreen
-import com.tungnk123.zark.ui.signin.SigninScreen
+import com.tungnk123.zark.ui.signin.SignInScreen
 
 @Composable
 fun AppNavHost(
@@ -24,7 +24,7 @@ fun AppNavHost(
             )
         }
         baseComposable(NavigationBarMetadataItem.Signin) {
-            SigninScreen(
+            SignInScreen(
                 navController = navController
             )
         }
