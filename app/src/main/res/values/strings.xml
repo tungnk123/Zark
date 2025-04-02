@@ -2,6 +2,7 @@
     <string name="app_name">zark</string>
     <string name="login">Login</string>
     <string name="signin">Signin</string>
+    <string name="msg_chat">Chat</string>
     <string name="msg_login_subtitle">Đăng nhập vào tài khoản của bạn để tiếp tục cuộc trò chuyện</string>
     <string name="msg_login_title">Chào mừng bạn trở lại</string>
     <string name="msg_password">"Mật khẩu: "</string>

@@ -127,7 +127,9 @@ fun LoginScreen(
 
                 PrimaryButton(
                     textResId = R.string.msg_login,
-                    onClick = {}
+                    onClick = {
+                        navController.navigate(NavigationBarMetadataItem.Chat.navigationRoute.route)
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(18.dp))
@@ -141,7 +143,7 @@ fun LoginScreen(
                         )
                     )
                     TextButton(onClick = {
-                        navController.navigate(NavigationBarMetadataItem.Signin.navigationRoute.route)
+                        navController.navigate(NavigationBarMetadataItem.SignIn.navigationRoute.route)
                     }) {
                         Text(
                             text = stringResource(R.string.msg_signin_now),
