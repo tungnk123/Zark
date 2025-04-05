@@ -1,10 +1,8 @@
 package com.tungnk123.zark.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.MusicNote
-import androidx.compose.material.icons.outlined.Face
-import androidx.compose.material.icons.outlined.MusicNote
+import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.tungnk123.zark.R
 
@@ -16,14 +14,20 @@ enum class NavigationBarMetadataItem(
 ) {
     Login(
         labelResId = R.string.login,
-        selectedIcon = Icons.Filled.Face,
-        unselectedIcon = Icons.Outlined.Face,
+        selectedIcon = Icons.AutoMirrored.Filled.Login,
+        unselectedIcon = Icons.AutoMirrored.Filled.Login,
         navigationRoute = NavigationRoute.Login
     ),
-    Signin(
+    SignIn(
         labelResId = R.string.signin,
-        selectedIcon = Icons.Filled.MusicNote,
-        unselectedIcon = Icons.Outlined.MusicNote,
-        navigationRoute = NavigationRoute.Signin
+        selectedIcon = Icons.AutoMirrored.Filled.Login,
+        unselectedIcon = Icons.AutoMirrored.Filled.Login,
+        navigationRoute = NavigationRoute.SignIn
+    ),
+    Chat(
+        labelResId = R.string.msg_chat,
+        selectedIcon = Icons.AutoMirrored.Filled.Chat,
+        unselectedIcon = Icons.AutoMirrored.Filled.Chat,
+        navigationRoute = NavigationRoute.Chat
     ),
 }

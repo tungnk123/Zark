@@ -2,6 +2,7 @@
     <string name="app_name">zark</string>
     <string name="login">Login</string>
     <string name="signin">Signin</string>
+    <string name="msg_chat">Chat</string>
     <string name="msg_login_subtitle">Đăng nhập vào tài khoản của bạn để tiếp tục cuộc trò chuyện</string>
     <string name="msg_login_title">Chào mừng bạn trở lại</string>
     <string name="msg_password">"Mật khẩu: "</string>
@@ -20,4 +21,8 @@
     <string name="msg_sign_in_account">Đăng ký tài khoản SETCHAT</string>
     <string name="msg_term">Điều khoản dịch vụ</string>
     <string name="msg_privacy_policy">Chính sách riêng tư</string>
+    <string name="msg_search_icon">Search Icon</string>
+    <string name="msg_clear_search">Clear Search</string>
+    <string name="msg_search_placeholder">Tìm kiếm</string>
+    <string name="msg_zark">Zark</string>
 </resources>

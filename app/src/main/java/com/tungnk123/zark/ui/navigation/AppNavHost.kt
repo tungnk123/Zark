@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.tungnk123.zark.ui.chat.ChatScreen
 import com.tungnk123.zark.ui.login.LoginScreen
 import com.tungnk123.zark.ui.signin.SignInScreen
 
@@ -23,8 +24,13 @@ fun AppNavHost(
                 navController = navController
             )
         }
-        baseComposable(NavigationBarMetadataItem.Signin) {
+        baseComposable(NavigationBarMetadataItem.SignIn) {
             SignInScreen(
+                navController = navController
+            )
+        }
+        baseComposable(NavigationBarMetadataItem.Chat) {
+            ChatScreen(
                 navController = navController
             )
         }
