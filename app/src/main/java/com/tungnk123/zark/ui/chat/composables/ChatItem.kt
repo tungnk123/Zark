@@ -2,6 +2,7 @@ package com.tungnk123.zark.ui.chat.composables
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,16 +39,17 @@ fun ChatItem(
     lastMessage: String,
     lastChatTime: LocalDateTime,
     isSeen: Boolean,
+    onChatItemClick: () -> Unit,
     modifier: Modifier = Modifier,
     @DrawableRes defaultLogoResId: Int = R.drawable.ic_logo,
 ) {
     Row(
-        modifier = modifier.padding(12.dp),
+        modifier = modifier.padding(vertical = 12.dp).clickable(onClick = onChatItemClick),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier = Modifier
-                .size(45.dp)
+                .size(55.dp)
                 .clip(CircleShape)
         ) {
             AsyncImage(
@@ -71,7 +73,7 @@ fun ChatItem(
                 text = lastMessage,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = if (isSeen) c_848484 else Color.Black,
-                    fontSize = 13.sp,
+                    fontSize = 12.sp,
                     fontWeight = if (isSeen) FontWeight.W400 else FontWeight.W600
                 )
             )
@@ -110,6 +112,7 @@ fun ChatItemPreview() {
         name = "John Doe",
         lastMessage = "Hello, how are you?",
         lastChatTime = LocalDateTime.now(),
-        isSeen = false
+        isSeen = false,
+        onChatItemClick = {}
     )
 }

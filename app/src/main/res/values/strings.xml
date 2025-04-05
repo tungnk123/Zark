@@ -21,4 +21,8 @@
     <string name="msg_sign_in_account">Đăng ký tài khoản SETCHAT</string>
     <string name="msg_term">Điều khoản dịch vụ</string>
     <string name="msg_privacy_policy">Chính sách riêng tư</string>
+    <string name="msg_search_icon">Search Icon</string>
+    <string name="msg_clear_search">Clear Search</string>
+    <string name="msg_search_placeholder">Tìm kiếm</string>
+    <string name="msg_zark">Zark</string>
 </resources>
