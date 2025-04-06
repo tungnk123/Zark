@@ -1,6 +1,7 @@
 package com.tungnk123.zark.ui.navigation
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
@@ -38,7 +39,7 @@ fun BottomNavigationBar(
                         label = "bottom-bar-${tab.navigationRoute}",
                         targetState = isSelected
                     ) {
-                        Icon(
+                        Image(
                             painter = painterResource(if (it) tab.selectedIconRes else tab.unselectedIconRes),
                             contentDescription = tab.navigationRoute.route
                         )
