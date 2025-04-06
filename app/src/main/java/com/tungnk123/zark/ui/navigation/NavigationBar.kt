@@ -1,7 +1,6 @@
 package com.tungnk123.zark.ui.navigation
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
@@ -11,11 +10,10 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.tungnk123.zark.utils.extensions.swipeable
 
 @Composable
 fun BottomNavigationBar(
@@ -26,14 +24,6 @@ fun BottomNavigationBar(
 ) {
     NavigationBar(
         modifier = modifier
-            .pointerInput(Unit) {
-                detectTapGestures {
-//                    showTabsSheet = true
-                }
-            }
-            .swipeable(onSwipeUp = {
-//                showTabsSheet = true
-            })
     ) {
         Spacer(modifier = Modifier.width(2.dp))
 
@@ -49,7 +39,7 @@ fun BottomNavigationBar(
                         targetState = isSelected
                     ) {
                         Icon(
-                            imageVector = if (it) tab.selectedIcon else tab.unselectedIcon,
+                            painter = painterResource(if (it) tab.selectedIconRes else tab.unselectedIconRes),
                             contentDescription = tab.navigationRoute.route
                         )
                     }

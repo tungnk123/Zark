@@ -1,33 +1,54 @@
 package com.tungnk123.zark.ui.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.material.icons.automirrored.filled.Login
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.annotation.DrawableRes
 import com.tungnk123.zark.R
 
 enum class NavigationBarMetadataItem(
-    val labelResId: Int,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
-    val navigationRoute: NavigationRoute
+    val labelResId: String,
+    @DrawableRes val selectedIconRes: Int,
+    @DrawableRes val unselectedIconRes: Int,
+    val navigationRoute: NavigationRoute,
 ) {
     Login(
-        labelResId = R.string.login,
-        selectedIcon = Icons.AutoMirrored.Filled.Login,
-        unselectedIcon = Icons.AutoMirrored.Filled.Login,
+        labelResId = NavigationRoute.Login.name,
+        selectedIconRes = R.drawable.ic_chat_selected,
+        unselectedIconRes = R.drawable.ic_chat,
         navigationRoute = NavigationRoute.Login
     ),
     SignIn(
-        labelResId = R.string.signin,
-        selectedIcon = Icons.AutoMirrored.Filled.Login,
-        unselectedIcon = Icons.AutoMirrored.Filled.Login,
+        labelResId = NavigationRoute.SignIn.name,
+        selectedIconRes = R.drawable.ic_chat_selected,
+        unselectedIconRes = R.drawable.ic_chat,
         navigationRoute = NavigationRoute.SignIn
     ),
     Chat(
-        labelResId = R.string.msg_chat,
-        selectedIcon = Icons.AutoMirrored.Filled.Chat,
-        unselectedIcon = Icons.AutoMirrored.Filled.Chat,
+        labelResId = NavigationRoute.Chat.name,
+        selectedIconRes = R.drawable.ic_chat_selected,
+        unselectedIconRes = R.drawable.ic_chat,
         navigationRoute = NavigationRoute.Chat
     ),
+    Calendar(
+        labelResId = NavigationRoute.Calendar.name,
+        selectedIconRes = R.drawable.ic_calendar_selected,
+        unselectedIconRes = R.drawable.ic_calendar,
+        navigationRoute = NavigationRoute.Calendar
+    ),
+    Workplace(
+        labelResId = NavigationRoute.Workplace.name,
+        selectedIconRes = R.drawable.ic_workplace_selected,
+        unselectedIconRes = R.drawable.ic_workplace,
+        navigationRoute = NavigationRoute.Workplace
+    ),
+    Document(
+        labelResId = NavigationRoute.Document.name,
+        selectedIconRes = R.drawable.ic_document_selected,
+        unselectedIconRes = R.drawable.ic_document,
+        navigationRoute = NavigationRoute.Document
+    ),
+    More(
+        labelResId = NavigationRoute.More.name,
+        selectedIconRes = R.drawable.ic_more_selected,
+        unselectedIconRes = R.drawable.ic_more,
+        navigationRoute = NavigationRoute.More
+    )
 }

@@ -12,7 +12,7 @@ import com.tungnk123.zark.ui.signin.SignInScreen
 fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    startDestination: String = NavigationRoute.Login.route
+    startDestination: String = NavigationRoute.Chat.route
 ) {
     NavHost(
         navController = navController,
