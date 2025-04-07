@@ -1,21 +1,27 @@
 package com.tungnk123.zark.ui.navigation
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Icon
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.tungnk123.zark.utils.extensions.swipeable
+import androidx.compose.ui.unit.sp
+import com.tungnk123.zark.ui.theme.c_4A86F7
+import com.tungnk123.zark.ui.theme.c_848484
 
 @Composable
 fun BottomNavigationBar(
@@ -24,50 +30,64 @@ fun BottomNavigationBar(
     onTabSelected: (NavigationBarMetadataItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    NavigationBar(
-        modifier = modifier
-            .pointerInput(Unit) {
-                detectTapGestures {
-//                    showTabsSheet = true
-                }
-            }
-            .swipeable(onSwipeUp = {
-//                showTabsSheet = true
-            })
-    ) {
-        Spacer(modifier = Modifier.width(2.dp))
+    Column(modifier = modifier.clipToBounds()) {
+        HorizontalDivider(
+            thickness = 0.5.dp,
+            color = c_848484
+        )
 
-        tabItemsList.forEach { tab ->
-            val isSelected = currentTab.navigationRoute == tab.navigationRoute
+        NavigationBar(
+            containerColor = Color.White,
+            tonalElevation = 0.dp,
+        ) {
+            tabItemsList.forEach { tab ->
+                val isSelected = currentTab.navigationRoute == tab.navigationRoute
 
-            NavigationBarItem(
-                selected = isSelected,
-                alwaysShowLabel = true,
-                icon = {
-                    Crossfade(
-                        label = "bottom-bar-${tab.navigationRoute}",
-                        targetState = isSelected
-                    ) {
-                        Icon(
-                            imageVector = if (it) tab.selectedIcon else tab.unselectedIcon,
-                            contentDescription = tab.navigationRoute.route
+                NavigationBarItem(
+                    selected = isSelected,
+                    alwaysShowLabel = true,
+                    icon = {
+                        Crossfade(
+                            label = "bottom-bar-${tab.navigationRoute}",
+                            targetState = isSelected
+                        ) {
+                            Image(
+                                painter = painterResource(if (it) tab.selectedIconRes else tab.unselectedIconRes),
+                                contentDescription = tab.navigationRoute.route,
+                                modifier = Modifier
+                                    .width(20.dp)
+                            )
+                        }
+                    },
+                    label = {
+                        Text(
+                            text = tab.navigationRoute.name,
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontSize = 8.sp
+                            ),
+                            textAlign = TextAlign.Center,
+                            overflow = TextOverflow.Ellipsis,
+                            softWrap = false,
+                            modifier = Modifier
+                                .padding(top = 0.dp)
                         )
-                    }
-                },
-                label = {
-                    Text(
-                        text = tab.navigationRoute.name,
-                        style = MaterialTheme.typography.labelSmall,
-                        textAlign = TextAlign.Center,
-                        overflow = TextOverflow.Ellipsis,
-                        softWrap = false
-                    )
-                },
-                onClick = {
-                    onTabSelected(tab)
-                }
-            )
+                    },
+                    onClick = { onTabSelected(tab) },
+                    colors = NavigationBarItemDefaults.colors(
+                        indicatorColor = Color.Transparent,
+                        selectedTextColor = c_4A86F7,
+                        selectedIconColor = c_4A86F7,
+                        unselectedTextColor = c_848484,
+                        unselectedIconColor = c_848484
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(
+                            horizontal = 0.dp,
+                            vertical = 2.dp
+                        )
+                )
+            }
         }
-        Spacer(modifier = Modifier.width(2.dp))
     }
 }
