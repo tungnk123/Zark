@@ -17,8 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.tungnk123.zark.ui.chat.composables.ChatItem
 import com.tungnk123.zark.ui.chat.composables.ChatTopBar
+import com.tungnk123.zark.ui.chat.composables.SwipeChatItem
 import com.tungnk123.zark.ui.common.SearchBar
 import java.time.LocalDateTime
 
@@ -62,12 +62,19 @@ fun ChatScreen(
                 Spacer(modifier = Modifier.height(14.dp))
             }
             items(chatEntities.value) { item ->
-                ChatItem(
+
+                SwipeChatItem(
                     name = item.name,
                     lastMessage = item.lastMessage,
                     lastChatTime = LocalDateTime.now(),
                     isSeen = item.isSeenLastMessage,
-                    onChatItemClick = {}
+                    onChatItemClick = {},
+                    logoUrl = null,
+                    onNotify = {},
+                    onDelete = {},
+                    onPin = {},
+                    onArchive = {},
+                    onMarkUnread = {},
                 )
             }
 

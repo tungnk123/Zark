@@ -25,4 +25,9 @@
     <string name="msg_clear_search">Clear Search</string>
     <string name="msg_search_placeholder">Tìm kiếm</string>
     <string name="msg_zark">Zark</string>
+    <string name="msg_mute">Mute</string>
+    <string name="msg_delete">Xóa</string>
+    <string name="msg_archive">Lưu trữ</string>
+    <string name="msg_unread">Chưa đọc</string>
+    <string name="msg_pin">Ghim</string>
 </resources>
