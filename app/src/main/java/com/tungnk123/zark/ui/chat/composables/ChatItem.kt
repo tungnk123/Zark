@@ -44,7 +44,10 @@ fun ChatItem(
     @DrawableRes defaultLogoResId: Int = R.drawable.ic_logo,
 ) {
     Row(
-        modifier = modifier.padding(vertical = 12.dp).clickable(onClick = onChatItemClick),
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .clickable(onClick = onChatItemClick)
+            .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -113,6 +116,5 @@ fun ChatItemPreview() {
         lastMessage = "Hello, how are you?",
         lastChatTime = LocalDateTime.now(),
         isSeen = false,
-        onChatItemClick = {}
-    )
+        onChatItemClick = {})
 }
