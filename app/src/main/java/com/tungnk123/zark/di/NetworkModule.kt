@@ -19,6 +19,7 @@ import okhttp3.internal.platform.Platform
 import retrofit2.Retrofit
 import java.io.File
 import java.util.concurrent.TimeUnit
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
@@ -27,6 +28,7 @@ object NetworkModule {
 
     private const val TIMEOUT_MINUTES = 1L
     private const val CACHE_SIZE = 50L * 1024 * 1024
+    private const val MAX_STALE_CACHE_TIME = 604800
     private val json = Json { ignoreUnknownKeys = true }
 
     @Provides
@@ -38,6 +40,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    @HeaderInterceptor
     fun provideHeaderInterceptor(): Interceptor = Interceptor { chain ->
         val request = chain.request()
             .newBuilder()
@@ -59,14 +62,26 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    @ForceCacheInterceptor
+    fun provideForceCacheInterceptor(): Interceptor = Interceptor { chain ->
+        val response = chain.proceed(chain.request())
+        response.newBuilder()
+            .header("Cache-Control", "public, only-if-cached, max-stale=$MAX_STALE_CACHE_TIME")
+            .build()
+    }
+
+    @Provides
+    @Singleton
     fun provideHttpClient(
-        headerInterceptor: Interceptor,
+        @HeaderInterceptor headerInterceptor: Interceptor,
         loggingInterceptor: LoggingInterceptor,
+        @ForceCacheInterceptor forceCacheInterceptor: Interceptor,
         cache: Cache
     ): OkHttpClient = OkHttpClient.Builder()
         .cache(cache)
         .addInterceptor(headerInterceptor)
         .addInterceptor(loggingInterceptor)
+        .addNetworkInterceptor(forceCacheInterceptor)
         .connectTimeout(TIMEOUT_MINUTES, TimeUnit.MINUTES)
         .readTimeout(TIMEOUT_MINUTES, TimeUnit.MINUTES)
         .build()
@@ -82,3 +97,11 @@ object NetworkModule {
             .build()
     }
 }
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class HeaderInterceptor
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ForceCacheInterceptor
