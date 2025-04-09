@@ -5,6 +5,7 @@ import com.ihsanbal.logging.Level
 import com.ihsanbal.logging.LoggingInterceptor
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.tungnk123.zark.BuildConfig
+import com.tungnk123.zark.network.UserService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,6 +18,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.internal.platform.Platform
 import retrofit2.Retrofit
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Qualifier
@@ -44,8 +46,7 @@ object NetworkModule {
     fun provideHeaderInterceptor(): Interceptor = Interceptor { chain ->
         val request = chain.request()
             .newBuilder()
-            .addHeader("Content-Type", "application/json")
-            .addHeader("Accept", "application/json")
+            .addHeader("Accept", "*/*")
             .addHeader("Authorization", BuildConfig.ACCESS_TOKEN)
             .build()
         chain.proceed(request)
@@ -93,9 +94,15 @@ object NetworkModule {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.CHAT_BASE_URL)
             .client(okHttpClient)
+            .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
     }
+
+    @Provides
+    @Singleton
+    fun provideUserService(retrofit: Retrofit): UserService =
+        retrofit.create(UserService::class.java)
 }
 
 @Qualifier

@@ -129,6 +129,7 @@ dependencies {
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.retrofit)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.converter.scalars)
 
     // logging
     implementation(libs.okhttp)
