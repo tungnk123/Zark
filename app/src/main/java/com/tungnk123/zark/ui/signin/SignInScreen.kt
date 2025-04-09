@@ -44,7 +44,7 @@ fun SignInScreen(
     modifier: Modifier = Modifier,
     signInViewModel: SignInViewModel = hiltViewModel()
 ) {
-    var phone by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
@@ -94,8 +94,8 @@ fun SignInScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 CustomTextField(
-                    value = phone,
-                    onValueChange = { phone = it },
+                    value = email,
+                    onValueChange = { email = it },
                     labelResId = R.string.msg_phone,
                     leadIconResId = R.drawable.ic_phone,
                     modifier = Modifier.fillMaxWidth()
@@ -129,7 +129,12 @@ fun SignInScreen(
 
                 PrimaryButton(
                     textResId = R.string.msg_continue,
-                    onClick = {}
+                    onClick = {
+                        signInViewModel.registerUser(
+                            email = email,
+                            password = password
+                        )
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(18.dp))

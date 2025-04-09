@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -31,6 +33,21 @@ android {
             )
         }
     }
+    val chatHost = "https://zarkchat-fvfgfuhactbbc2bv.southeastasia-01.azurewebsites.net/api/"
+    flavorDimensions.add("default")
+    productFlavors {
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        create("dev") {
+            buildConfigField("String", "CHAT_BASE_URL", "\"$chatHost\"")
+            buildConfigField(
+                "String",
+                "ACCESS_TOKEN",
+                "\"${properties.getProperty("ACCESS_TOKEN")}\""
+            )
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -40,6 +57,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -106,4 +124,16 @@ dependencies {
 
     // Accompanist
     implementation(libs.accompanist.systemuicontroller)
+
+    // Retrofit
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
+    implementation(libs.retrofit)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.converter.scalars)
+
+    // logging
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+    implementation(libs.okhttp3.logging.interceptor)
+    implementation(libs.logginginterceptor)
 }
