@@ -18,14 +18,16 @@ class SignInViewModel @Inject constructor(
         email: String,
         password: String
     ) {
-        try {
-            viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
                 val response = userRepository.registerUser(email, password)
                 "Response: $response".printLog("test_res")
             }
+            catch (e: Exception) {
+                e.printException(tag = "test_res")
+            }
         }
-        catch (e: Exception) {
-            e.printException(tag = "test_res")
-        }
+
+
     }
 }
