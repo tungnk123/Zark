@@ -16,4 +16,5 @@ class UserRepositoryImpl @Inject constructor(
         userDataSource.loginUser(loginRequest)
 
     override suspend fun getContacts(userId: Int) = userDataSource.getContacts(userId)
+    override suspend fun getUserIdByEmail(email: String) = userDataSource.getUserIdByEmail(email)
 }

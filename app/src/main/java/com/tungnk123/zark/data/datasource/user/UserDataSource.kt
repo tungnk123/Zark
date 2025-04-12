@@ -15,4 +15,5 @@ interface UserDataSource {
     ): LoginResponse
 
     suspend fun getContacts(userId: Int): List<Contact>
+    suspend fun getUserIdByEmail(email: String): Int
 }

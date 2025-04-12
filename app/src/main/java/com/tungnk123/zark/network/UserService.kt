@@ -24,4 +24,7 @@ interface UserService {
     suspend fun getContacts(
         @Query("userId") userId: Int
     ): List<Contact>
+
+    @GET("User/get-id-by-email")
+    suspend fun getUserIdByEmail(email: String): Int
 }
