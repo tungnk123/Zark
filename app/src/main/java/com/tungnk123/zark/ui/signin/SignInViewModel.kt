@@ -27,7 +27,5 @@ class SignInViewModel @Inject constructor(
                 e.printException(tag = "test_res")
             }
         }
-
-
     }
 }

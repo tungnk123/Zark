@@ -6,6 +6,8 @@ import com.ihsanbal.logging.LoggingInterceptor
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.tungnk123.zark.BuildConfig
 import com.tungnk123.zark.network.UserService
+import com.tungnk123.zark.network.interceptor.AuthInterceptor
+import com.tungnk123.zark.utils.TokenManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,15 +44,11 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    @HeaderInterceptor
-    fun provideHeaderInterceptor(): Interceptor = Interceptor { chain ->
-        val request = chain.request()
-            .newBuilder()
-            .addHeader("Accept", "*/*")
-            .addHeader("Authorization", BuildConfig.ACCESS_TOKEN)
-            .build()
-        chain.proceed(request)
-    }
+    @AuthInterceptorAnnotation
+    fun provideAuthInterceptor(
+        tokenManager: TokenManager
+    ) = AuthInterceptor(tokenManager)
+
 
     @Provides
     @Singleton
@@ -63,7 +61,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    @ForceCacheInterceptor
+    @ForceCacheInterceptorAnnotation
     fun provideForceCacheInterceptor(): Interceptor = Interceptor { chain ->
         val response = chain.proceed(chain.request())
         response.newBuilder()
@@ -74,13 +72,13 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideHttpClient(
-        @HeaderInterceptor headerInterceptor: Interceptor,
+        @AuthInterceptorAnnotation authInterceptor: AuthInterceptor,
         loggingInterceptor: LoggingInterceptor,
-        @ForceCacheInterceptor forceCacheInterceptor: Interceptor,
+        @ForceCacheInterceptorAnnotation forceCacheInterceptor: Interceptor,
         cache: Cache
     ): OkHttpClient = OkHttpClient.Builder()
         .cache(cache)
-        .addInterceptor(headerInterceptor)
+        .addInterceptor(authInterceptor)
         .addInterceptor(loggingInterceptor)
         .addNetworkInterceptor(forceCacheInterceptor)
         .connectTimeout(TIMEOUT_MINUTES, TimeUnit.MINUTES)
@@ -107,8 +105,8 @@ object NetworkModule {
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class HeaderInterceptor
+annotation class AuthInterceptorAnnotation
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class ForceCacheInterceptor
+annotation class ForceCacheInterceptorAnnotation

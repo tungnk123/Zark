@@ -1,5 +1,6 @@
 package com.tungnk123.zark.data.datasource.remote.user
 
+import com.tungnk123.zark.data.dto.LoginRequest
 import com.tungnk123.zark.network.UserService
 import javax.inject.Inject
 
@@ -10,4 +11,7 @@ class UserDataSourceImpl @Inject constructor(
         email: String,
         password: String
     ) = userService.registerUser(email, password)
+
+    override suspend fun loginUser(loginRequest: LoginRequest) =
+        userService.loginUser(loginRequest)
 }

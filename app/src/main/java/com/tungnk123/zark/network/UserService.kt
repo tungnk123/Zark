@@ -1,6 +1,8 @@
 package com.tungnk123.zark.network
 
-import retrofit2.http.Header
+import com.tungnk123.zark.data.dto.LoginRequest
+import com.tungnk123.zark.data.dto.LoginResponse
+import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.Query
 
@@ -10,4 +12,9 @@ interface UserService {
         @Query("email") email: String,
         @Query("password") password: String,
     ): String
+
+    @POST("User/login")
+    suspend fun loginUser(
+        @Body request: LoginRequest
+    ): LoginResponse
 }

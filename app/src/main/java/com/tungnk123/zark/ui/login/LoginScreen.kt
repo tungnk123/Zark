@@ -1,6 +1,7 @@
 package com.tungnk123.zark.ui.login
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,25 +11,26 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.tungnk123.zark.R
 import com.tungnk123.zark.ui.common.CustomTextField
@@ -36,6 +38,7 @@ import com.tungnk123.zark.ui.common.PrimaryButton
 import com.tungnk123.zark.ui.navigation.NavigationBarMetadataItem
 import com.tungnk123.zark.ui.theme.c_4A86F7
 import com.tungnk123.zark.ui.theme.c_6A7185
+import com.tungnk123.zark.utils.extensions.showToast
 
 @Composable
 fun LoginScreen(
@@ -43,8 +46,24 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
-    var phone by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val uiState by loginViewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+
+    LaunchedEffect(uiState.isSuccessLogin) {
+        if (uiState.isSuccessLogin) {
+            navController.navigate(NavigationBarMetadataItem.Chat.navigationRoute.route) {
+                popUpTo(0)
+            }
+            loginViewModel.consumeSuccess()
+        }
+    }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
+            context.showToast(it)
+            loginViewModel.clearError()
+        }
+    }
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -92,8 +111,8 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 CustomTextField(
-                    value = phone,
-                    onValueChange = { phone = it },
+                    value = uiState.email,
+                    onValueChange = loginViewModel::updateEmail,
                     labelResId = R.string.msg_phone,
                     leadIconResId = R.drawable.ic_phone,
                     modifier = Modifier.fillMaxWidth()
@@ -102,8 +121,8 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 CustomTextField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = uiState.password,
+                    onValueChange = loginViewModel::updatePassWord,
                     labelResId = R.string.msg_password,
                     leadIconResId = R.drawable.ic_lock,
                     isPasswordField = true,
@@ -128,7 +147,7 @@ fun LoginScreen(
                 PrimaryButton(
                     textResId = R.string.msg_login,
                     onClick = {
-                        navController.navigate(NavigationBarMetadataItem.Chat.navigationRoute.route)
+                        loginViewModel.login()
                     }
                 )
 
@@ -155,6 +174,17 @@ fun LoginScreen(
                 }
 
             }
+        }
+    }
+
+    if (uiState.isLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
         }
     }
 }
