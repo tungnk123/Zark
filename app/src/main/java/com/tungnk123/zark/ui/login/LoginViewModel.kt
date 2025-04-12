@@ -2,8 +2,9 @@ package com.tungnk123.zark.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tungnk123.zark.data.datasource.remote.user.UserDataSource
+import com.tungnk123.zark.data.datasource.user.UserDataSource
 import com.tungnk123.zark.data.dto.LoginRequest
+import com.tungnk123.zark.repository.user.UserRepository
 import com.tungnk123.zark.ui.login.state.LoginUiState
 import com.tungnk123.zark.utils.TokenManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val userDataSource: UserDataSource,
+    private val userRepository: UserRepository,
     private val tokenManager: TokenManager
 ) : ViewModel() {
 
@@ -39,7 +40,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                val response = userDataSource.loginUser(
+                val response = userRepository.loginUser(
                     LoginRequest(_uiState.value.email, _uiState.value.password)
                 )
                 tokenManager.saveToken(response.token)

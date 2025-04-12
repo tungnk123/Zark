@@ -1,4 +1,4 @@
-package com.tungnk123.zark.data.datasource.remote.user
+package com.tungnk123.zark.data.datasource.user
 
 import com.tungnk123.zark.data.dto.LoginRequest
 import com.tungnk123.zark.network.UserService
@@ -14,4 +14,6 @@ class UserDataSourceImpl @Inject constructor(
 
     override suspend fun loginUser(loginRequest: LoginRequest) =
         userService.loginUser(loginRequest)
+
+    override suspend fun getContacts(userId: Int) = userService.getContacts(userId)
 }

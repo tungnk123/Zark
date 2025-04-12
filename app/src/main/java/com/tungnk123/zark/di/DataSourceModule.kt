@@ -1,9 +1,9 @@
 package com.tungnk123.zark.di
 
-import com.tungnk123.zark.data.datasource.local.chat.LocalChatDataSource
-import com.tungnk123.zark.data.datasource.local.chat.LocalChatDataSourceImpl
-import com.tungnk123.zark.data.datasource.remote.user.UserDataSource
-import com.tungnk123.zark.data.datasource.remote.user.UserDataSourceImpl
+import com.tungnk123.zark.data.datasource.chat.ChatDataSource
+import com.tungnk123.zark.data.datasource.chat.LocalChatDataSourceImpl
+import com.tungnk123.zark.data.datasource.user.UserDataSource
+import com.tungnk123.zark.data.datasource.user.UserDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -16,7 +16,7 @@ interface DataSourceModule {
 
     @Binds
     @Singleton
-    fun bindLocalChatDataSource(localChatDataSource: LocalChatDataSourceImpl): LocalChatDataSource
+    fun bindLocalChatDataSource(localChatDataSource: LocalChatDataSourceImpl): ChatDataSource
 
     @Binds
     @Singleton
