@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,10 +29,14 @@ fun ChatScreen(
     modifier: Modifier = Modifier,
     chatViewModel: ChatViewModel = hiltViewModel()
 ) {
-
+    val uiState by chatViewModel.uiState.collectAsStateWithLifecycle()
     val chatEntities = chatViewModel.chatEntities.collectAsStateWithLifecycle()
     var query by remember {
         mutableStateOf("")
+    }
+
+    LaunchedEffect(Unit) {
+        chatViewModel.loadContacts(userId = 1)
     }
 
     Scaffold(
