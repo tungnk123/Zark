@@ -136,4 +136,7 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.okhttp3.logging.interceptor)
     implementation(libs.logginginterceptor)
+
+    // SignalR
+    implementation(libs.signalr)
 }
