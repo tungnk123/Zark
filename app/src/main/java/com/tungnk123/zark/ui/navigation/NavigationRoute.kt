@@ -4,6 +4,7 @@ sealed class NavigationRoute(val route: String, val name: String = "") {
     data object Login : NavigationRoute("log_in", "Đăng nhập")
     data object SignIn : NavigationRoute("sign_in", "Đăng ký")
     data object Chat : NavigationRoute("chat", "Chat")
+    data object Home : NavigationRoute("home", "Chat")
     data object Calendar : NavigationRoute("calendar", "Lịch")
     data object Workplace : NavigationRoute("workplace", "Nơi làm việc")
     data object Document : NavigationRoute("document", "Tài liệu")

@@ -9,22 +9,22 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface UserService {
-    @POST("User/register")
+    @POST("api/User/register")
     suspend fun registerUser(
         @Query("email") email: String,
         @Query("password") password: String,
     ): String
 
-    @POST("User/login")
+    @POST("api/User/login")
     suspend fun loginUser(
         @Body request: LoginRequest
     ): LoginResponse
 
-    @GET("User/contacts")
+    @GET("api/User/contacts")
     suspend fun getContacts(
         @Query("userId") userId: Int
     ): List<Contact>
 
-    @GET("User/get-id-by-email")
+    @GET("api/User/get-id-by-email")
     suspend fun getUserIdByEmail(email: String): Int
 }

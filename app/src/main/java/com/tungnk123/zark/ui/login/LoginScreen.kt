@@ -162,7 +162,7 @@ fun LoginScreen(
                         )
                     )
                     TextButton(onClick = {
-                        navController.navigate(NavigationBarMetadataItem.SignIn.navigationRoute.route)
+                        navController.navigate(NavigationBarMetadataItem.SignIn)
                     }) {
                         Text(
                             text = stringResource(R.string.msg_signin_now),

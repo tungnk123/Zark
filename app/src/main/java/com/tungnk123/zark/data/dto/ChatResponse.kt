@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 @Serializable
 data class ChatResponse(
     val senderId: Int,
-    val receiverIt: Int,
+    val receiverId: Int,
     val content: String,
     @Serializable(with = LocalDateTimeSerializer::class)
     val timeStamp: LocalDateTime,

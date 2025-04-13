@@ -6,7 +6,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ChatService {
-    @GET("Messages/{userId1}/{userId2}")
+    @GET("api/Messages/{userId1}/{userId2}")
     suspend fun getMessages(
         @Path("userId1") senderId: Int,
         @Path("userId2") receiverId: Int,

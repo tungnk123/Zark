@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.tungnk123.zark.ui.calendar.CalendarScreen
 import com.tungnk123.zark.ui.chat.ChatScreen
+import com.tungnk123.zark.ui.home.HomeScreen
 import com.tungnk123.zark.ui.login.LoginScreen
 import com.tungnk123.zark.ui.signin.SignInScreen
 import com.tungnk123.zark.ui.workplace.WorkplaceScreen
@@ -28,6 +29,11 @@ fun AppNavHost(
         }
         baseComposable(NavigationBarMetadataItem.SignIn) {
             SignInScreen(
+                navController = navController
+            )
+        }
+        baseComposable(NavigationBarMetadataItem.Home) {
+            HomeScreen(
                 navController = navController
             )
         }
