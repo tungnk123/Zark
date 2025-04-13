@@ -1,4 +1,4 @@
-package com.tungnk123.zark.ui.chat.composables
+package com.tungnk123.zark.ui.home.composables
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.Animatable
@@ -39,7 +39,6 @@ import com.tungnk123.zark.ui.theme.c_4CB125
 import com.tungnk123.zark.ui.theme.c_6A7185
 import com.tungnk123.zark.ui.theme.c_D94841
 import com.tungnk123.zark.ui.theme.c_F2A84C
-import com.tungnk123.zark.ui.theme.c_F2F2F2
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 

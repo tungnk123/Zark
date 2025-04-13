@@ -1,27 +1,16 @@
 package com.tungnk123.zark.ui.chat
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.tungnk123.zark.ui.chat.composables.ChatTopBar
-import com.tungnk123.zark.ui.chat.composables.SwipeChatItem
-import com.tungnk123.zark.ui.common.SearchBar
-import java.time.LocalDateTime
+import com.tungnk123.zark.data.dto.ChatEntity
 
 @Composable
 fun ChatScreen(
@@ -29,60 +18,83 @@ fun ChatScreen(
     modifier: Modifier = Modifier,
     chatViewModel: ChatViewModel = hiltViewModel()
 ) {
-    val uiState by chatViewModel.uiState.collectAsStateWithLifecycle()
-    val chatEntities = chatViewModel.chatEntities.collectAsStateWithLifecycle()
-    var query by remember {
-        mutableStateOf("")
-    }
+    val incomingMessages by chatViewModel.incomingMessages.collectAsStateWithLifecycle()
+    val isConnected by chatViewModel.isConnected.collectAsStateWithLifecycle()
+    val chatList by chatViewModel.chatList.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        chatViewModel.loadContacts(userId = 1)
-    }
+    var message by remember { mutableStateOf("") }
 
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            ChatTopBar(
-                onAppLogoClick = {},
-                onEditClick = { }
-            )
-        },
-        containerColor = Color.White
-    ) { contentPaddings ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(contentPaddings)
-                .padding(horizontal = 16.dp)
-        ) {
-            item {
-                SearchBar(
-                    query = query,
-                    onQueryChanged = { newQuery ->
-                        query = newQuery
-                    },
-                    onClearQuery = {
-                        query = ""
-                    }
-                )
-                Spacer(modifier = Modifier.height(14.dp))
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text("Chat", modifier = Modifier.padding(bottom = 8.dp))
+
+        Text("Chats", modifier = Modifier.padding(bottom = 8.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            chatList.forEach { chat ->
+                ChatItem(chat)
             }
-            items(chatEntities.value) { item ->
-
-                SwipeChatItem(
-                    name = item.name,
-                    lastMessage = item.lastMessage,
-                    lastChatTime = LocalDateTime.now(),
-                    isSeen = item.isSeenLastMessage,
-                    onChatItemClick = {},
-                    logoUrl = null,
-                    onNotify = {},
-                    onDelete = {},
-                    onPin = {},
-                    onArchive = {},
-                    onMarkUnread = {},
-                )
-            }
-
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text("Incoming Messages", modifier = Modifier.padding(bottom = 8.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            incomingMessages.forEach { (senderId, content) ->
+                Text("From $senderId: $content")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Message input field
+        BasicTextField(
+            value = message,
+            onValueChange = { message = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        )
+
+        // Send button
+        Button(
+            onClick = {
+                if (isConnected) {
+                    chatViewModel.sendMessage(senderId = 1, receiverId = 2, content = message)
+                    message = ""
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Send Message")
+        }
+
+        Button(
+            onClick = {
+                if (isConnected) {
+                    chatViewModel.stopConnection()
+                } else {
+                    chatViewModel.startConnection()
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+        ) {
+            Text(if (isConnected) "Disconnect" else "Connect")
+        }
+    }
+}
+
+@Composable
+private fun ChatItem(chat: ChatEntity) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(vertical = 4.dp)) {
+        Text("Name: ${chat.senderId}")
+        Text("Last message: ${chat.content}")
+        Text("Seen: ${if (chat.isSeen) "Yes" else "No"}")
     }
 }

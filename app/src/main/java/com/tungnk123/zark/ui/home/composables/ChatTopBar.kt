@@ -1,4 +1,4 @@
-package com.tungnk123.zark.ui.chat.composables
+package com.tungnk123.zark.ui.home.composables
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
