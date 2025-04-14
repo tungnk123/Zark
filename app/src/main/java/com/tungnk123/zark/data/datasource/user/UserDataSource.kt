@@ -1,8 +1,8 @@
 package com.tungnk123.zark.data.datasource.user
 
 import com.tungnk123.zark.data.dto.Contact
-import com.tungnk123.zark.data.dto.LoginRequest
-import com.tungnk123.zark.data.dto.LoginResponse
+import com.tungnk123.zark.data.dto.user.LoginRequest
+import com.tungnk123.zark.data.dto.user.LoginResponse
 
 interface UserDataSource {
     suspend fun registerUser(

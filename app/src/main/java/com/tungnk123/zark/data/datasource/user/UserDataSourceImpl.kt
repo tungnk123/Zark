@@ -1,6 +1,6 @@
 package com.tungnk123.zark.data.datasource.user
 
-import com.tungnk123.zark.data.dto.LoginRequest
+import com.tungnk123.zark.data.dto.user.LoginRequest
 import com.tungnk123.zark.network.UserService
 import javax.inject.Inject
 

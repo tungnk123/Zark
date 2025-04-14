@@ -1,11 +1,10 @@
 package com.tungnk123.zark.network
 
-import com.tungnk123.zark.data.dto.Contact
-import com.tungnk123.zark.data.dto.FindUserByEmailResponse
-import com.tungnk123.zark.data.dto.LoginRequest
-import com.tungnk123.zark.data.dto.LoginResponse
-import com.tungnk123.zark.data.dto.SignInRequest
-import com.tungnk123.zark.data.dto.SignInResponse
+import com.tungnk123.zark.data.dto.user.FindUserByEmailResponse
+import com.tungnk123.zark.data.dto.user.LoginRequest
+import com.tungnk123.zark.data.dto.user.LoginResponse
+import com.tungnk123.zark.data.dto.user.SignInRequest
+import com.tungnk123.zark.data.dto.user.SignInResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST

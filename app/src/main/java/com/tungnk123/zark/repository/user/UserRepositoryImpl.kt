@@ -1,7 +1,7 @@
 package com.tungnk123.zark.repository.user
 
 import com.tungnk123.zark.data.datasource.user.UserDataSource
-import com.tungnk123.zark.data.dto.LoginRequest
+import com.tungnk123.zark.data.dto.user.LoginRequest
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
