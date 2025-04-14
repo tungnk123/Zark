@@ -5,6 +5,7 @@ import com.ihsanbal.logging.Level
 import com.ihsanbal.logging.LoggingInterceptor
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.tungnk123.zark.BuildConfig
+import com.tungnk123.zark.network.ConversationService
 import com.tungnk123.zark.network.MessageService
 import com.tungnk123.zark.network.UserService
 import com.tungnk123.zark.network.interceptor.AuthInterceptor
@@ -105,8 +106,13 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideChatService(retrofit: Retrofit): MessageService =
+    fun provideMessageService(retrofit: Retrofit): MessageService =
         retrofit.create(MessageService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideConversationService(retrofit: Retrofit): ConversationService =
+        retrofit.create(ConversationService::class.java)
 }
 
 @Qualifier

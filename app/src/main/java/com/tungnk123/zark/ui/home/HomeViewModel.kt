@@ -2,7 +2,8 @@ package com.tungnk123.zark.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tungnk123.zark.repository.chat.ChatRepository
+import com.tungnk123.zark.repository.message.MessageRepository
+import com.tungnk123.zark.repository.conversation.ConversationRepository
 import com.tungnk123.zark.repository.user.UserRepository
 import com.tungnk123.zark.ui.home.state.HomeUiState
 import com.tungnk123.zark.utils.SignalRManager
@@ -18,8 +19,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val chatRepository: ChatRepository,
+    private val messageRepository: MessageRepository,
     private val userRepository: UserRepository,
+    private val conversationRepository: ConversationRepository,
     private val signalRManager: SignalRManager
 ) : ViewModel() {
 
@@ -27,7 +29,7 @@ class HomeViewModel @Inject constructor(
         private const val TAG = "ChatViewModel"
     }
 
-    val chatEntities = chatRepository.observeChatEntities()
+    val chatEntities = messageRepository.observeChatEntities()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000L),
@@ -49,7 +51,7 @@ class HomeViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = true)
 
             try {
-                val contacts = userRepository.getContacts(userId)
+                val contacts = conversationRepository.getConversations()
                 "Contacts: $contacts".printLog("test_contact")
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,

@@ -1,7 +1,9 @@
 package com.tungnk123.zark.di
 
-import com.tungnk123.zark.data.datasource.chat.ChatDataSource
-import com.tungnk123.zark.data.datasource.chat.LocalChatDataSourceImpl
+import com.tungnk123.zark.data.datasource.chat.LocalMessageDataSourceImpl
+import com.tungnk123.zark.data.datasource.chat.MessageDataSource
+import com.tungnk123.zark.data.datasource.conversation.ConversationDataSource
+import com.tungnk123.zark.data.datasource.conversation.ConversationDataSourceImpl
 import com.tungnk123.zark.data.datasource.user.UserDataSource
 import com.tungnk123.zark.data.datasource.user.UserDataSourceImpl
 import dagger.Binds
@@ -16,9 +18,13 @@ interface DataSourceModule {
 
     @Binds
     @Singleton
-    fun bindLocalChatDataSource(localChatDataSource: LocalChatDataSourceImpl): ChatDataSource
+    fun bindLocalChatDataSource(localChatDataSource: LocalMessageDataSourceImpl): MessageDataSource
 
     @Binds
     @Singleton
     fun bindUserDataSource(userDataSourceImpl: UserDataSourceImpl): UserDataSource
+
+    @Binds
+    @Singleton
+    fun bindConversationDataSource(conversationDataSourceImpl: ConversationDataSourceImpl): ConversationDataSource
 }

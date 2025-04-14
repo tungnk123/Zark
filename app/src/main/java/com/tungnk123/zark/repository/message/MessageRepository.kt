@@ -1,9 +1,9 @@
-package com.tungnk123.zark.repository.chat
+package com.tungnk123.zark.repository.message
 
 import com.tungnk123.zark.data.dto.ChatEntity
 import kotlinx.coroutines.flow.Flow
 
-interface ChatRepository {
+interface MessageRepository {
     fun observeChatEntities(): Flow<List<ChatEntity>>
 
     suspend fun getChatHistory(senderId: Int, receiverId: Int, page: Int, size: Int): List<ChatEntity>

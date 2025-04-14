@@ -1,6 +1,6 @@
-package com.tungnk123.zark.repository.chat
+package com.tungnk123.zark.repository.message
 
-import com.tungnk123.zark.data.datasource.chat.ChatDataSource
+import com.tungnk123.zark.data.datasource.chat.MessageDataSource
 import com.tungnk123.zark.data.dto.ChatEntity
 import com.tungnk123.zark.network.MessageService
 import com.tungnk123.zark.utils.SignalRManager
@@ -8,14 +8,14 @@ import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-class ChatRepositoryImpl @Inject constructor(
-    private val chatDataSource: ChatDataSource,
+class MessageRepositoryImpl @Inject constructor(
+    private val messageDataSource: MessageDataSource,
     private val messageService: MessageService,
     private val signalRManager: SignalRManager
-) : ChatRepository {
+) : MessageRepository {
 
     override fun observeChatEntities(): Flow<List<ChatEntity>> =
-        chatDataSource.observeChatEntities()
+        messageDataSource.observeChatEntities()
 
     override suspend fun getChatHistory(
         senderId: Int,
@@ -23,13 +23,13 @@ class ChatRepositoryImpl @Inject constructor(
         page: Int,
         size: Int
     ): List<ChatEntity> {
-        return messageService.getMessages(senderId, receiverId, page, size)
+        return messageService.getMessages(senderId, page, size)
             .map {
                 ChatEntity(
-                    senderId = it.senderId,
-                    receiverId = it.receiverId,
-                    content = it.content,
-                    timestamp = it.timeStamp
+                    senderId = it.userSendId,
+                    receiverId = it.chatMessageId,
+                    content = it.message,
+                    timestamp = it.sendDate
                 )
             }
     }

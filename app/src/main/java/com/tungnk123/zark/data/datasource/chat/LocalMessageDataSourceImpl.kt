@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.flowOf
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-class LocalChatDataSourceImpl @Inject constructor() : ChatDataSource {
+class LocalMessageDataSourceImpl @Inject constructor() : MessageDataSource {
 
     override fun observeChatEntities(): Flow<List<ChatEntity>> = flowOf(getMockChatEntities())
 

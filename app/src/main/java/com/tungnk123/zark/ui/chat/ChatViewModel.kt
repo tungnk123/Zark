@@ -3,7 +3,7 @@ package com.tungnk123.zark.ui.chat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tungnk123.zark.data.dto.ChatEntity
-import com.tungnk123.zark.repository.chat.ChatRepository
+import com.tungnk123.zark.repository.message.MessageRepository
 import com.tungnk123.zark.utils.SignalRManager
 import com.tungnk123.zark.utils.extensions.printException
 import com.tungnk123.zark.utils.extensions.printLog
@@ -19,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val signalRManager: SignalRManager,
-    private val chatRepository: ChatRepository
+    private val messageRepository: MessageRepository
 ) : ViewModel() {
 
     companion object {
@@ -41,7 +41,7 @@ class ChatViewModel @Inject constructor(
 
     private fun observeChats() {
         viewModelScope.launch(Dispatchers.IO) {
-            chatRepository.observeChatEntities()
+            messageRepository.observeChatEntities()
                 .catch { e -> e.printException(TAG) }
                 .collectLatest { chats ->
                     _chatList.value = chats

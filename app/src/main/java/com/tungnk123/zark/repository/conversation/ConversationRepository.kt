@@ -1,18 +1,13 @@
-package com.tungnk123.zark.network
+package com.tungnk123.zark.repository.conversation
 
 import com.tungnk123.zark.data.dto.conversation.ConversationResponse
 import com.tungnk123.zark.data.dto.conversation.CreateConversationRequest
 import com.tungnk123.zark.data.dto.conversation.CreateConversationResponse
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
 
-interface ConversationService {
-    @POST("api/Conversation/create")
+interface ConversationRepository {
     suspend fun createConversation(
-        @Body request: CreateConversationRequest
+        createConversationRequest: CreateConversationRequest
     ): CreateConversationResponse
 
-    @GET("api/Conversation/conversations")
     suspend fun getConversations(): List<ConversationResponse>
 }
