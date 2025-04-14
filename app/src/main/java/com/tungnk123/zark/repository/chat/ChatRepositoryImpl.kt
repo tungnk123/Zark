@@ -2,7 +2,7 @@ package com.tungnk123.zark.repository.chat
 
 import com.tungnk123.zark.data.datasource.chat.ChatDataSource
 import com.tungnk123.zark.data.dto.ChatEntity
-import com.tungnk123.zark.network.ChatService
+import com.tungnk123.zark.network.MessageService
 import com.tungnk123.zark.utils.SignalRManager
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 class ChatRepositoryImpl @Inject constructor(
     private val chatDataSource: ChatDataSource,
-    private val chatService: ChatService,
+    private val messageService: MessageService,
     private val signalRManager: SignalRManager
 ) : ChatRepository {
 
@@ -23,7 +23,7 @@ class ChatRepositoryImpl @Inject constructor(
         page: Int,
         size: Int
     ): List<ChatEntity> {
-        return chatService.getMessages(senderId, receiverId, page, size)
+        return messageService.getMessages(senderId, receiverId, page, size)
             .map {
                 ChatEntity(
                     senderId = it.senderId,
