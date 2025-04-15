@@ -1,16 +1,25 @@
 package com.tungnk123.zark.ui.chat
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.tungnk123.zark.data.dto.ChatEntity
+import com.tungnk123.zark.data.dto.message.ChatMessageResponse
 
 @Composable
 fun ChatScreen(
@@ -42,8 +51,8 @@ fun ChatScreen(
 
         Text("Incoming Messages", modifier = Modifier.padding(bottom = 8.dp))
         Column(modifier = Modifier.weight(1f)) {
-            incomingMessages.forEach { (senderId, content) ->
-                Text("From $senderId: $content")
+            incomingMessages.forEach { chat ->
+                Text("From ${chat.userSendId}: ${chat.message}")
             }
         }
 
@@ -62,7 +71,11 @@ fun ChatScreen(
         Button(
             onClick = {
                 if (isConnected) {
-                    chatViewModel.sendMessage(senderId = 1, receiverId = 2, content = message)
+                    chatViewModel.sendMessage(
+                        conversationId = 1,
+                        senderId = 1,
+                        content = message
+                    )
                     message = ""
                 }
             },
@@ -89,12 +102,15 @@ fun ChatScreen(
 }
 
 @Composable
-private fun ChatItem(chat: ChatEntity) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(vertical = 4.dp)) {
-        Text("Name: ${chat.senderId}")
-        Text("Last message: ${chat.content}")
-        Text("Seen: ${if (chat.isSeen) "Yes" else "No"}")
+private fun ChatItem(chat: ChatMessageResponse) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Text("From: ${chat.senderUsername} (ID: ${chat.userSendId})")
+        Text("Message: ${chat.message}")
+        Text("Type: ${chat.type}")
+        Text("Sent at: ${chat.sendDate}")
     }
 }

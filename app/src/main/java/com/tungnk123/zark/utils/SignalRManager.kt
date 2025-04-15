@@ -1,5 +1,6 @@
 package com.tungnk123.zark.utils
 
+import android.annotation.SuppressLint
 import com.microsoft.signalr.HubConnection
 import com.microsoft.signalr.HubConnectionBuilder
 import com.microsoft.signalr.HubConnectionState
@@ -22,52 +23,75 @@ class SignalRManager @Inject constructor(
         private const val TAG = "SignalRManager"
         private const val HUB_URL = BuildConfig.CHAT_BASE_URL + "chatHub"
         private const val RECEIVE_MESSAGE = "ReceiveMessage"
-        private const val SEND_PRIVATE_MESSAGE = "SendPrivateMessage"
+        private const val SEND_MESSAGE = "SendMessage"
     }
 
-    suspend fun startConnection(
-        onReceiveMessage: (Int, String) -> Unit,
+    private var onReceiveMessage: ((conversationId: Int, senderId: Int, content: String, type: String, sendDate: String) -> Unit)? =
+        null
+
+    suspend fun connect(
+        onMessageReceived: (Int, Int, String, String, String) -> Unit,
         onError: (Throwable) -> Unit
     ) {
         val token = tokenManager.token.first() ?: return
-        "Token: $token".printLog(TAG)
+        "Connecting with token: $token".printLog(TAG)
 
         hubConnection = HubConnectionBuilder.create(HUB_URL)
             .withAccessTokenProvider(Single.defer { Single.just(token) })
             .build()
 
-        hubConnection?.on(RECEIVE_MESSAGE, { senderId: Int, content: String ->
-            onReceiveMessage(senderId, content)
-        }, Int::class.java, String::class.java)
+        onReceiveMessage = onMessageReceived
+
+        hubConnection?.on(
+            RECEIVE_MESSAGE,
+            { conversationId: Int, userSendId: Int, content: String, type: String, sendDate: String ->
+                onReceiveMessage?.invoke(conversationId, userSendId, content, type, sendDate)
+            },
+            Int::class.java,
+            Int::class.java,
+            String::class.java,
+            String::class.java,
+            String::class.java
+        )
 
         connectionDisposable = hubConnection?.start()
             ?.subscribe({
-                "Connected".printLog(TAG)
+                "Connected to SignalR".printLog(TAG)
             }, { error ->
+                "SignalR connection error: ${error.message}".printLog(TAG)
                 onError(error)
             })
     }
 
+    @SuppressLint("CheckResult")
     fun sendMessage(
+        conversationId: Int,
         senderId: Int,
-        receiverId: Int,
-        content: String
+        content: String,
+        type: String = "Text"
     ) {
-        hubConnection?.invoke(SEND_PRIVATE_MESSAGE, senderId, receiverId, content)
-    }
+        if (!isConnected()) {
+            "Cannot send message: not connected".printLog(TAG)
+            return
+        }
 
-    fun listenIncomingMessages(onReceive: (senderId: Int, content: String) -> Unit) {
-        hubConnection?.on(RECEIVE_MESSAGE, { senderId: Int, content: String ->
-            onReceive(senderId, content)
-        }, Int::class.java, String::class.java)
+        hubConnection?.invoke(SEND_MESSAGE, conversationId, senderId, content, type)
+            ?.doOnError { it.printStackTrace() }
+            ?.subscribe({
+                "Message sent to $conversationId".printLog(TAG)
+            }, {
+                "Failed to send message: ${it.message}".printLog(TAG)
+            })
     }
 
     fun disconnect() {
         hubConnection?.stop()
         connectionDisposable?.dispose()
+        hubConnection = null
+        "Disconnected from SignalR".printLog(TAG)
     }
 
     fun isConnected(): Boolean = hubConnection?.connectionState == HubConnectionState.CONNECTED
 
-    fun getHub(): HubConnection? = hubConnection
+    fun getConnection(): HubConnection? = hubConnection
 }

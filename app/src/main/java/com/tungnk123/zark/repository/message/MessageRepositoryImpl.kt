@@ -1,11 +1,11 @@
 package com.tungnk123.zark.repository.message
 
 import com.tungnk123.zark.data.datasource.chat.MessageDataSource
-import com.tungnk123.zark.data.dto.ChatEntity
+import com.tungnk123.zark.data.dto.message.ChatMessageResponse
 import com.tungnk123.zark.network.MessageService
 import com.tungnk123.zark.utils.SignalRManager
-import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 class MessageRepositoryImpl @Inject constructor(
@@ -14,49 +14,53 @@ class MessageRepositoryImpl @Inject constructor(
     private val signalRManager: SignalRManager
 ) : MessageRepository {
 
-    override fun observeChatEntities(): Flow<List<ChatEntity>> =
-        messageDataSource.observeChatEntities()
-
     override suspend fun getChatHistory(
         senderId: Int,
         receiverId: Int,
         page: Int,
         size: Int
-    ): List<ChatEntity> {
+    ): List<ChatMessageResponse> {
         return messageService.getMessages(senderId, page, size)
-            .map {
-                ChatEntity(
-                    senderId = it.userSendId,
-                    receiverId = it.chatMessageId,
-                    content = it.message,
-                    timestamp = it.sendDate
-                )
-            }
     }
 
     override suspend fun startSignalRConnection(
-        onReceiveMessage: (ChatEntity) -> Unit,
+        onReceiveMessage: (ChatMessageResponse) -> Unit,
         onError: (Throwable) -> Unit
     ) {
-        signalRManager.startConnection(
-            onReceiveMessage = { senderId, content ->
-                val entity = ChatEntity(
-                    senderId = senderId,
-                    receiverId = -1,
-                    content = content,
-                    timestamp = LocalDateTime.now()
+        signalRManager.connect(
+            onMessageReceived = { conversationId, senderId, content, type, sendDateStr ->
+                val formatter = DateTimeFormatter.ISO_DATE_TIME
+                val sendDate = try {
+                    LocalDateTime.parse(sendDateStr, formatter)
+                }
+                catch (e: Exception) {
+                    LocalDateTime.now()
+                }
+
+                val message = ChatMessageResponse(
+                    chatMessageId = 0,
+                    conversationId = conversationId,
+                    userSendId = senderId,
+                    senderUsername = "User $senderId",
+                    message = content,
+                    mediaLink = "null",
+                    type = type,
+                    sendDate = sendDate
                 )
-                onReceiveMessage(entity)
+                onReceiveMessage(message)
             }, onError = onError
         )
     }
 
     override suspend fun sendMessage(
+        conversationId: Int,
         senderId: Int,
-        receiverId: Int,
-        content: String
+        content: String,
+        type: String
     ) {
-        signalRManager.sendMessage(senderId, receiverId, content)
+        signalRManager.sendMessage(
+            conversationId = conversationId, senderId = senderId, content = content, type = type
+        )
     }
 
     override fun disconnectSignalR() {

@@ -1,19 +1,28 @@
 package com.tungnk123.zark.repository.message
 
-import com.tungnk123.zark.data.dto.ChatEntity
-import kotlinx.coroutines.flow.Flow
+import com.tungnk123.zark.data.dto.message.ChatMessageResponse
 
 interface MessageRepository {
-    fun observeChatEntities(): Flow<List<ChatEntity>>
 
-    suspend fun getChatHistory(senderId: Int, receiverId: Int, page: Int, size: Int): List<ChatEntity>
+    suspend fun getChatHistory(
+        senderId: Int,
+        receiverId: Int,
+        page: Int,
+        size: Int
+    ): List<ChatMessageResponse>
 
     suspend fun startSignalRConnection(
-        onReceiveMessage: (ChatEntity) -> Unit,
+        onReceiveMessage: (ChatMessageResponse) -> Unit,
         onError: (Throwable) -> Unit
     )
 
-    suspend fun sendMessage(senderId: Int, receiverId: Int, content: String)
+    suspend fun sendMessage(
+        conversationId: Int,
+        senderId: Int,
+        content: String,
+        type: String
+    )
 
     fun disconnectSignalR()
 }
+

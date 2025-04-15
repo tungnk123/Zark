@@ -2,88 +2,77 @@ package com.tungnk123.zark.ui.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tungnk123.zark.data.dto.ChatEntity
+import com.tungnk123.zark.data.dto.message.ChatMessageResponse
 import com.tungnk123.zark.repository.message.MessageRepository
-import com.tungnk123.zark.utils.SignalRManager
 import com.tungnk123.zark.utils.extensions.printException
-import com.tungnk123.zark.utils.extensions.printLog
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val signalRManager: SignalRManager,
     private val messageRepository: MessageRepository
 ) : ViewModel() {
+
+    private val _incomingMessages = MutableStateFlow<List<ChatMessageResponse>>(emptyList())
+    val incomingMessages: StateFlow<List<ChatMessageResponse>> get() = _incomingMessages
+
+    private val _isConnected = MutableStateFlow(false)
+    val isConnected: StateFlow<Boolean> get() = _isConnected
+
+    private val _chatList = MutableStateFlow<List<ChatMessageResponse>>(emptyList())
+    val chatList: StateFlow<List<ChatMessageResponse>> get() = _chatList
 
     companion object {
         private const val TAG = "ChatViewModel"
     }
 
-    private val _incomingMessages = MutableStateFlow<List<Pair<Int, String>>>(emptyList())
-    val incomingMessages: StateFlow<List<Pair<Int, String>>> get() = _incomingMessages
-
-    private val _isConnected = MutableStateFlow(false)
-    val isConnected: StateFlow<Boolean> get() = _isConnected
-
-    private val _chatList = MutableStateFlow<List<ChatEntity>>(emptyList())
-    val chatList: StateFlow<List<ChatEntity>> get() = _chatList
-
     init {
-        observeChats()
-    }
-
-    private fun observeChats() {
-        viewModelScope.launch(Dispatchers.IO) {
-            messageRepository.observeChatEntities()
-                .catch { e -> e.printException(TAG) }
-                .collectLatest { chats ->
-                    _chatList.value = chats
-                }
-        }
+        startConnection()
     }
 
     fun startConnection() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                signalRManager.startConnection(
-                    onReceiveMessage = { senderId, content ->
-                        _incomingMessages.value = _incomingMessages.value + Pair(senderId, content)
-                    },
-                    onError = { error ->
-                        "$error".printLog(TAG)
-                        error.printStackTrace()
-                    }
-                )
-                _isConnected.value = signalRManager.isConnected()
-            } catch (e: Exception) {
+                messageRepository.startSignalRConnection(onReceiveMessage = { chatMessage ->
+                    _incomingMessages.value = _incomingMessages.value + chatMessage
+                    }, onError = {
+                    it.printException(TAG)
+                })
+                _isConnected.value = true
+            }
+            catch (e: Exception) {
                 e.printException(TAG)
             }
         }
     }
 
     fun sendMessage(
+        conversationId: Int,
         senderId: Int,
-        receiverId: Int,
-        content: String
+        content: String,
+        type: String = "Text"
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                signalRManager.sendMessage(senderId, receiverId, content)
-            } catch (e: Exception) {
+                messageRepository.sendMessage(
+                    conversationId = conversationId,
+                    senderId = senderId,
+                    content = content,
+                    type = type
+                )
+            }
+            catch (e: Exception) {
                 e.printException(TAG)
             }
         }
     }
 
     fun stopConnection() {
-        signalRManager.disconnect()
+        messageRepository.disconnectSignalR()
         _isConnected.value = false
     }
 
@@ -92,3 +81,4 @@ class ChatViewModel @Inject constructor(
         stopConnection()
     }
 }
+

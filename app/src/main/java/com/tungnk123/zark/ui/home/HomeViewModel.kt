@@ -54,33 +54,4 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-
-    fun startConnection() {
-        viewModelScope.launch {
-            signalRManager.startConnection(onReceiveMessage = { senderId, content ->
-                _incomingMessages.value = _incomingMessages.value + Pair(senderId, content)
-            }, onError = { error ->
-                error.printStackTrace()
-            })
-            _isConnected.value = signalRManager.isConnected()
-        }
-    }
-
-    fun sendMessage(
-        senderId: Int,
-        receiverId: Int,
-        content: String
-    ) {
-        signalRManager.sendMessage(senderId, receiverId, content)
-    }
-
-    fun stopConnection() {
-        signalRManager.disconnect()
-        _isConnected.value = false
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        stopConnection()
-    }
 }
