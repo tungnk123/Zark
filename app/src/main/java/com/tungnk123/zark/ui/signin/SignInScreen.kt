@@ -37,6 +37,7 @@ import com.tungnk123.zark.ui.common.TermsAndPrivacyText
 import com.tungnk123.zark.ui.navigation.NavigationBarMetadataItem
 import com.tungnk123.zark.ui.theme.c_4A86F7
 import com.tungnk123.zark.ui.theme.c_6A7185
+import com.tungnk123.zark.utils.extensions.navigateToDestination
 
 @Composable
 fun SignInScreen(
@@ -151,7 +152,7 @@ fun SignInScreen(
                         )
                     )
                     TextButton(onClick = {
-                        navController.navigate(NavigationBarMetadataItem.Login)
+                        navController.navigateToDestination(NavigationBarMetadataItem.Login)
                     }) {
                         Text(
                             text = stringResource(R.string.msg_login_now),

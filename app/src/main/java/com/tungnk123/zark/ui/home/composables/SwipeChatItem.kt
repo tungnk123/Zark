@@ -47,7 +47,7 @@ fun SwipeChatItem(
     name: String,
     logoUrl: Uri? = null,
     lastMessage: String,
-    lastChatTime: LocalDateTime,
+    lastChatTime: LocalDateTime?,
     isSeen: Boolean,
     onChatItemClick: () -> Unit,
     onNotify: () -> Unit,

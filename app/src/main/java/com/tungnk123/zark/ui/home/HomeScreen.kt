@@ -22,7 +22,7 @@ import com.tungnk123.zark.ui.common.SearchBar
 import com.tungnk123.zark.ui.home.composables.ChatTopBar
 import com.tungnk123.zark.ui.home.composables.SwipeChatItem
 import com.tungnk123.zark.ui.navigation.NavigationBarMetadataItem
-import java.time.LocalDateTime
+import com.tungnk123.zark.utils.extensions.navigateToDestination
 
 @Composable
 fun HomeScreen(
@@ -31,13 +31,12 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
-    val chatEntities = homeViewModel.chatEntities.collectAsStateWithLifecycle()
     var query by remember {
         mutableStateOf("")
     }
 
     LaunchedEffect(Unit) {
-        homeViewModel.loadContacts(userId = 1)
+        homeViewModel.loadContacts()
     }
 
     Scaffold(
@@ -67,15 +66,14 @@ fun HomeScreen(
                 )
                 Spacer(modifier = Modifier.height(14.dp))
             }
-            items(chatEntities.value) { item ->
-
+            items(uiState.contacts) { item ->
                 SwipeChatItem(
-                    name = item.senderId.toString(),
-                    lastMessage = item.content,
-                    lastChatTime = LocalDateTime.now(),
-                    isSeen = item.isSeen,
+                    name = item.name,
+                    lastMessage = item.lastMessage,
+                    lastChatTime = item.lastMessageAt,
+                    isSeen = false,
                     onChatItemClick = {
-                        navController.navigate(NavigationBarMetadataItem.Chat)
+                        navController.navigateToDestination(NavigationBarMetadataItem.Chat)
                     },
                     logoUrl = null,
                     onNotify = {},

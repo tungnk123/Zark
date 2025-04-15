@@ -2,25 +2,21 @@ package com.tungnk123.zark.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tungnk123.zark.repository.message.MessageRepository
 import com.tungnk123.zark.repository.conversation.ConversationRepository
-import com.tungnk123.zark.repository.user.UserRepository
+import com.tungnk123.zark.repository.message.MessageRepository
 import com.tungnk123.zark.ui.home.state.HomeUiState
 import com.tungnk123.zark.utils.SignalRManager
 import com.tungnk123.zark.utils.extensions.printException
 import com.tungnk123.zark.utils.extensions.printLog
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val messageRepository: MessageRepository,
-    private val userRepository: UserRepository,
     private val conversationRepository: ConversationRepository,
     private val signalRManager: SignalRManager
 ) : ViewModel() {
@@ -28,13 +24,6 @@ class HomeViewModel @Inject constructor(
     companion object {
         private const val TAG = "ChatViewModel"
     }
-
-    val chatEntities = messageRepository.observeChatEntities()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = emptyList()
-        )
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState
@@ -45,7 +34,7 @@ class HomeViewModel @Inject constructor(
     private val _isConnected = MutableStateFlow(false)
     val isConnected: StateFlow<Boolean> get() = _isConnected
 
-    fun loadContacts(userId: Int) {
+    fun loadContacts() {
         "LoadContacts".printLog("test_contact")
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
@@ -54,16 +43,13 @@ class HomeViewModel @Inject constructor(
                 val contacts = conversationRepository.getConversations()
                 "Contacts: $contacts".printLog("test_contact")
                 _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    contacts = contacts,
-                    error = null
+                    isLoading = false, contacts = contacts, error = null
                 )
             }
             catch (e: Exception) {
                 e.printException(TAG)
                 _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    error = e.message
+                    isLoading = false, error = e.message
                 )
             }
         }
@@ -71,19 +57,20 @@ class HomeViewModel @Inject constructor(
 
     fun startConnection() {
         viewModelScope.launch {
-            signalRManager.startConnection(
-                onReceiveMessage = { senderId, content ->
-                    _incomingMessages.value = _incomingMessages.value + Pair(senderId, content)
-                },
-                onError = { error ->
-                    error.printStackTrace()
-                }
-            )
+            signalRManager.startConnection(onReceiveMessage = { senderId, content ->
+                _incomingMessages.value = _incomingMessages.value + Pair(senderId, content)
+            }, onError = { error ->
+                error.printStackTrace()
+            })
             _isConnected.value = signalRManager.isConnected()
         }
     }
 
-    fun sendMessage(senderId: Int, receiverId: Int, content: String) {
+    fun sendMessage(
+        senderId: Int,
+        receiverId: Int,
+        content: String
+    ) {
         signalRManager.sendMessage(senderId, receiverId, content)
     }
 

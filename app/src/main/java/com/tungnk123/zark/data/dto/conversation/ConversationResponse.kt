@@ -11,7 +11,7 @@ data class ConversationResponse(
     val name: String,
     val lastMessage: String,
     @Serializable(with = LocalDateTimeSerializer::class)
-    val lastMessageAt: LocalDateTime,
+    val lastMessageAt: LocalDateTime?,
     val participants: List<Participant>
 )
 

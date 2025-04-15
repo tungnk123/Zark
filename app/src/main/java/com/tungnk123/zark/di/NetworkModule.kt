@@ -34,7 +34,7 @@ object NetworkModule {
 
     private const val TIMEOUT_MINUTES = 1L
     private const val CACHE_SIZE = 50L * 1024 * 1024
-    private const val MAX_STALE_CACHE_TIME = 604800
+    private const val MAX_STALE_CACHE_TIME = 60
     private val json = Json { ignoreUnknownKeys = true }
 
     @Provides
@@ -82,7 +82,6 @@ object NetworkModule {
         .cache(cache)
         .addInterceptor(authInterceptor)
         .addInterceptor(loggingInterceptor)
-        .addNetworkInterceptor(forceCacheInterceptor)
         .connectTimeout(TIMEOUT_MINUTES, TimeUnit.MINUTES)
         .readTimeout(TIMEOUT_MINUTES, TimeUnit.MINUTES)
         .build()
