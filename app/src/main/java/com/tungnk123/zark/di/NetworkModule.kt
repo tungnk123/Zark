@@ -5,6 +5,8 @@ import com.ihsanbal.logging.Level
 import com.ihsanbal.logging.LoggingInterceptor
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.tungnk123.zark.BuildConfig
+import com.tungnk123.zark.network.ConversationService
+import com.tungnk123.zark.network.MessageService
 import com.tungnk123.zark.network.UserService
 import com.tungnk123.zark.network.interceptor.AuthInterceptor
 import com.tungnk123.zark.utils.TokenManager
@@ -32,7 +34,7 @@ object NetworkModule {
 
     private const val TIMEOUT_MINUTES = 1L
     private const val CACHE_SIZE = 50L * 1024 * 1024
-    private const val MAX_STALE_CACHE_TIME = 604800
+    private const val MAX_STALE_CACHE_TIME = 60
     private val json = Json { ignoreUnknownKeys = true }
 
     @Provides
@@ -80,7 +82,6 @@ object NetworkModule {
         .cache(cache)
         .addInterceptor(authInterceptor)
         .addInterceptor(loggingInterceptor)
-        .addNetworkInterceptor(forceCacheInterceptor)
         .connectTimeout(TIMEOUT_MINUTES, TimeUnit.MINUTES)
         .readTimeout(TIMEOUT_MINUTES, TimeUnit.MINUTES)
         .build()
@@ -101,6 +102,16 @@ object NetworkModule {
     @Singleton
     fun provideUserService(retrofit: Retrofit): UserService =
         retrofit.create(UserService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideMessageService(retrofit: Retrofit): MessageService =
+        retrofit.create(MessageService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideConversationService(retrofit: Retrofit): ConversationService =
+        retrofit.create(ConversationService::class.java)
 }
 
 @Qualifier

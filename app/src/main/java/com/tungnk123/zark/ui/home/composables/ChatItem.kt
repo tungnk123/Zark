@@ -1,4 +1,4 @@
-package com.tungnk123.zark.ui.chat.composables
+package com.tungnk123.zark.ui.home.composables
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
@@ -37,7 +37,7 @@ fun ChatItem(
     name: String,
     logoUrl: Uri? = null,
     lastMessage: String,
-    lastChatTime: LocalDateTime,
+    lastChatTime: LocalDateTime?,
     isSeen: Boolean,
     onChatItemClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -90,7 +90,7 @@ fun ChatItem(
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
-                text = lastChatTime.hour.toString(),
+                text = lastChatTime?.hour.toString(),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = c_848484,
                     fontSize = 13.sp

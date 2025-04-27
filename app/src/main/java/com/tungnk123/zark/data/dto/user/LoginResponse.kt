@@ -1,4 +1,4 @@
-package com.tungnk123.zark.data.dto
+package com.tungnk123.zark.data.dto.user
 
 import kotlinx.serialization.Serializable
 

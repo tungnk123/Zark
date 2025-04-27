@@ -2,8 +2,7 @@ package com.tungnk123.zark.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tungnk123.zark.data.datasource.user.UserDataSource
-import com.tungnk123.zark.data.dto.LoginRequest
+import com.tungnk123.zark.data.dto.user.LoginRequest
 import com.tungnk123.zark.repository.user.UserRepository
 import com.tungnk123.zark.ui.login.state.LoginUiState
 import com.tungnk123.zark.utils.TokenManager

@@ -22,7 +22,7 @@ class TokenManager @Inject constructor(@ApplicationContext private val context: 
         .map { it[TOKEN_KEY] }
 
     suspend fun saveToken(token: String) {
-        context.dataStore.edit { it[TOKEN_KEY] = token }
+        context.dataStore.edit { it[TOKEN_KEY] = token}
     }
 
     suspend fun clearToken() {

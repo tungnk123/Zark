@@ -33,7 +33,7 @@ android {
             )
         }
     }
-    val chatHost = "https://zarkchat-fvfgfuhactbbc2bv.southeastasia-01.azurewebsites.net/api/"
+    val chatHost = "https://zarkchat-fvfgfuhactbbc2bv.southeastasia-01.azurewebsites.net/"
     flavorDimensions.add("default")
     productFlavors {
         val properties = Properties()
@@ -136,4 +136,8 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.okhttp3.logging.interceptor)
     implementation(libs.logginginterceptor)
+
+    // SignalR
+    implementation(libs.signalr)
+    implementation(libs.signalrkore)
 }

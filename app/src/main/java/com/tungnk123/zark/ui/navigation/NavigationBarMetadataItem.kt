@@ -21,6 +21,12 @@ enum class NavigationBarMetadataItem(
         unselectedIconRes = R.drawable.ic_chat,
         navigationRoute = NavigationRoute.SignIn
     ),
+    Home(
+        labelResId = NavigationRoute.Home.name,
+        selectedIconRes = R.drawable.ic_chat_selected,
+        unselectedIconRes = R.drawable.ic_chat,
+        navigationRoute = NavigationRoute.Home
+    ),
     Chat(
         labelResId = NavigationRoute.Chat.name,
         selectedIconRes = R.drawable.ic_chat_selected,

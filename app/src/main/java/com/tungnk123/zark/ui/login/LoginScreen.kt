@@ -1,7 +1,6 @@
 package com.tungnk123.zark.ui.login
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +37,7 @@ import com.tungnk123.zark.ui.common.PrimaryButton
 import com.tungnk123.zark.ui.navigation.NavigationBarMetadataItem
 import com.tungnk123.zark.ui.theme.c_4A86F7
 import com.tungnk123.zark.ui.theme.c_6A7185
+import com.tungnk123.zark.utils.extensions.navigateToDestination
 import com.tungnk123.zark.utils.extensions.showToast
 
 @Composable
@@ -51,9 +51,7 @@ fun LoginScreen(
 
     LaunchedEffect(uiState.isSuccessLogin) {
         if (uiState.isSuccessLogin) {
-            navController.navigate(NavigationBarMetadataItem.Chat.navigationRoute.route) {
-                popUpTo(0)
-            }
+            navController.navigateToDestination(NavigationBarMetadataItem.Home)
             loginViewModel.consumeSuccess()
         }
     }
@@ -162,7 +160,7 @@ fun LoginScreen(
                         )
                     )
                     TextButton(onClick = {
-                        navController.navigate(NavigationBarMetadataItem.SignIn.navigationRoute.route)
+                        navController.navigateToDestination(NavigationBarMetadataItem.SignIn)
                     }) {
                         Text(
                             text = stringResource(R.string.msg_signin_now),
