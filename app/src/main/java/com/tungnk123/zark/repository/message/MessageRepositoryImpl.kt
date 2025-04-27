@@ -40,8 +40,7 @@ class MessageRepositoryImpl @Inject constructor(
                 val message = ChatMessageResponse(
                     chatMessageId = 0,
                     conversationId = conversationId,
-                    userSendId = senderId,
-                    senderUsername = "User $senderId",
+                    userSendId = senderId, senderDisplayName = "User $senderId",
                     message = content,
                     mediaLink = "null",
                     type = type,
@@ -63,7 +62,7 @@ class MessageRepositoryImpl @Inject constructor(
         )
     }
 
-    override fun disconnectSignalR() {
+    override suspend fun disconnectSignalR() {
         signalRManager.disconnect()
     }
 }

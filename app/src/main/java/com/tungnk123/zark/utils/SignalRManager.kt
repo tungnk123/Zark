@@ -1,14 +1,19 @@
 package com.tungnk123.zark.utils
 
-import android.annotation.SuppressLint
-import com.microsoft.signalr.HubConnection
-import com.microsoft.signalr.HubConnectionBuilder
-import com.microsoft.signalr.HubConnectionState
 import com.tungnk123.zark.BuildConfig
 import com.tungnk123.zark.utils.extensions.printLog
-import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.disposables.Disposable
-import kotlinx.coroutines.flow.first
+import eu.lepicekmichal.signalrkore.AutomaticReconnect
+import eu.lepicekmichal.signalrkore.HubConnection
+import eu.lepicekmichal.signalrkore.HubConnectionBuilder
+import eu.lepicekmichal.signalrkore.HubConnectionState
+import eu.lepicekmichal.signalrkore.TransportEnum
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,15 +21,17 @@ import javax.inject.Singleton
 class SignalRManager @Inject constructor(
     private val tokenManager: TokenManager
 ) {
-    private var hubConnection: HubConnection? = null
-    private var connectionDisposable: Disposable? = null
-
     companion object {
         private const val TAG = "SignalRManager"
         private const val HUB_URL = BuildConfig.CHAT_BASE_URL + "chatHub"
         private const val RECEIVE_MESSAGE = "ReceiveMessage"
         private const val SEND_MESSAGE = "SendMessage"
+        private const val DELAY_RECONNECT = 3_000L
     }
+
+    private var hubConnection: HubConnection? = null
+    private var connectionJob: Job? = null
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     private var onReceiveMessage: ((conversationId: Int, senderId: Int, content: String, type: String, sendDate: String) -> Unit)? =
         null
@@ -33,37 +40,71 @@ class SignalRManager @Inject constructor(
         onMessageReceived: (Int, Int, String, String, String) -> Unit,
         onError: (Throwable) -> Unit
     ) {
-        val token = tokenManager.token.first() ?: return
-        "Connecting with token: $token".printLog(TAG)
+        val token = tokenManager.token.firstOrNull()
+        if (token == null) {
+            "Token is null, cannot connect".printLog(TAG)
+            return
+        }
+        "Using token: $token".printLog(TAG)
+        "HUB_URL: $HUB_URL".printLog(TAG)
 
-        hubConnection = HubConnectionBuilder.create(HUB_URL)
-            .withAccessTokenProvider(Single.defer { Single.just(token) })
-            .build()
+        val hubUrlWithAccessToken = "$HUB_URL?access_token=$token"
 
         onReceiveMessage = onMessageReceived
 
-        hubConnection?.on(
-            RECEIVE_MESSAGE,
-            { conversationId: Int, userSendId: Int, content: String, type: String, sendDate: String ->
-                onReceiveMessage?.invoke(conversationId, userSendId, content, type, sendDate)
-            },
-            Int::class.java,
-            Int::class.java,
-            String::class.java,
-            String::class.java,
-            String::class.java
-        )
+        hubConnection = HubConnectionBuilder.create(hubUrlWithAccessToken) {
+            automaticReconnect = AutomaticReconnect.Active
+            transportEnum = TransportEnum.WebSockets
+        }
+        "Hub Connection created: $hubConnection".printLog(TAG)
 
-        connectionDisposable = hubConnection?.start()
-            ?.subscribe({
-                "Connected to SignalR".printLog(TAG)
-            }, { error ->
-                "SignalR connection error: ${error.message}".printLog(TAG)
-                onError(error)
-            })
+        observeConnectionState()
+
+        coroutineScope.launch {
+            hubConnection?.on(
+                RECEIVE_MESSAGE,
+                paramType1 = Int::class,
+                paramType2 = Int::class,
+                paramType3 = String::class,
+                paramType4 = String::class,
+                paramType5 = String::class
+            )
+                ?.collect { (conversationId, senderId, content, type, sendDate) ->
+                    "Message received - ConversationId: $conversationId, SenderId: $senderId, Type: $type, SendDate: $sendDate".printLog(
+                        TAG
+                    )
+                    onReceiveMessage?.invoke(conversationId, senderId, content, type, sendDate)
+                }
+        }
+
+        retryUntilConnected(onError)
     }
 
-    @SuppressLint("CheckResult")
+
+    private suspend fun retryUntilConnected(onError: (Throwable) -> Unit) {
+        var attempt = 0
+        while (hubConnection?.connectionState?.value != HubConnectionState.CONNECTED && attempt < 10) {
+            try {
+                "Attempt $attempt to connect to SignalR...".printLog(TAG)
+                hubConnection?.start()
+                delay(DELAY_RECONNECT)
+            }
+            catch (e: Exception) {
+                "SignalR connection error on attempt $attempt: ${e.message}".printLog(TAG)
+                onError(e)
+                delay(DELAY_RECONNECT)
+            }
+            attempt++
+        }
+
+        if (hubConnection?.connectionState?.value != HubConnectionState.CONNECTED) {
+            "Failed to connect after $attempt attempts".printLog(TAG)
+        }
+        else {
+            "Successfully connected to SignalR".printLog(TAG)
+        }
+    }
+
     fun sendMessage(
         conversationId: Int,
         senderId: Int,
@@ -71,27 +112,42 @@ class SignalRManager @Inject constructor(
         type: String = "Text"
     ) {
         if (!isConnected()) {
-            "Cannot send message: not connected".printLog(TAG)
+            "Cannot send message: not connected to SignalR".printLog(TAG)
             return
         }
 
-        hubConnection?.invoke(SEND_MESSAGE, conversationId, senderId, content, type)
-            ?.doOnError { it.printStackTrace() }
-            ?.subscribe({
-                "Message sent to $conversationId".printLog(TAG)
-            }, {
-                "Failed to send message: ${it.message}".printLog(TAG)
-            })
+        coroutineScope.launch {
+            try {
+                "Sending message to $conversationId: $content".printLog(TAG)
+                hubConnection?.send(SEND_MESSAGE, conversationId, senderId, content, type)
+                "Message sent to $conversationId successfully".printLog(TAG)
+            }
+            catch (e: Exception) {
+                "Failed to send message to $conversationId: ${e.message}".printLog(TAG)
+            }
+        }
     }
 
-    fun disconnect() {
+    suspend fun disconnect() {
+        coroutineScope.cancel()
         hubConnection?.stop()
-        connectionDisposable?.dispose()
+        connectionJob?.cancel()
         hubConnection = null
-        "Disconnected from SignalR".printLog(TAG)
     }
 
-    fun isConnected(): Boolean = hubConnection?.connectionState == HubConnectionState.CONNECTED
+    fun isConnected(): Boolean =
+        hubConnection?.connectionState?.value == HubConnectionState.CONNECTED
 
-    fun getConnection(): HubConnection? = hubConnection
+    private fun observeConnectionState() {
+        coroutineScope.launch {
+            hubConnection?.connectionState?.collect { state ->
+                when (state) {
+                    HubConnectionState.CONNECTED -> "Connected to SignalR".printLog(TAG)
+                    HubConnectionState.DISCONNECTED -> "Disconnected from SignalR".printLog(TAG)
+                    HubConnectionState.CONNECTING -> "Attempting to connect to SignalR".printLog(TAG)
+                    HubConnectionState.RECONNECTING -> "Reconnecting to SignalR".printLog(TAG)
+                }
+            }
+        }
+    }
 }

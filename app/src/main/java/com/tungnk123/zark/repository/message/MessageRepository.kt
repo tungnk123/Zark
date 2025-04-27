@@ -23,6 +23,6 @@ interface MessageRepository {
         type: String
     )
 
-    fun disconnectSignalR()
+    suspend fun disconnectSignalR()
 }
 

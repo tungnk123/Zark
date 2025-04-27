@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.tungnk123.zark.repository.conversation.ConversationRepository
 import com.tungnk123.zark.repository.message.MessageRepository
 import com.tungnk123.zark.ui.home.state.HomeUiState
-import com.tungnk123.zark.utils.SignalRManager
 import com.tungnk123.zark.utils.extensions.printException
 import com.tungnk123.zark.utils.extensions.printLog
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +17,6 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val messageRepository: MessageRepository,
     private val conversationRepository: ConversationRepository,
-    private val signalRManager: SignalRManager
 ) : ViewModel() {
 
     companion object {

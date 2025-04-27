@@ -72,7 +72,9 @@ class ChatViewModel @Inject constructor(
     }
 
     fun stopConnection() {
-        messageRepository.disconnectSignalR()
+        viewModelScope.launch {
+            messageRepository.disconnectSignalR()
+        }
         _isConnected.value = false
     }
 

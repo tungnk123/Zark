@@ -18,7 +18,7 @@ class AuthInterceptor @Inject constructor(
         }
 
         token?.let {
-            requestBuilder.addHeader("Authorization", it)
+            requestBuilder.addHeader("Authorization", "Bearer $it")
         }
 
         requestBuilder.addHeader("Accept", "*/*")

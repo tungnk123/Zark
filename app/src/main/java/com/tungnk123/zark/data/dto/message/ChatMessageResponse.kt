@@ -9,7 +9,7 @@ data class ChatMessageResponse(
     val chatMessageId: Int,
     val conversationId: Int,
     val userSendId: Int,
-    val senderUsername: String,
+    val senderDisplayName: String,
     val message: String,
     val mediaLink: String,
     val type: String,

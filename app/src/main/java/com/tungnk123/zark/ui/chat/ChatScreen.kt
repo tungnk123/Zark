@@ -108,7 +108,7 @@ private fun ChatItem(chat: ChatMessageResponse) {
             .fillMaxWidth()
             .padding(vertical = 4.dp)
     ) {
-        Text("From: ${chat.senderUsername} (ID: ${chat.userSendId})")
+        Text("From: ${chat.senderDisplayName} (ID: ${chat.userSendId})")
         Text("Message: ${chat.message}")
         Text("Type: ${chat.type}")
         Text("Sent at: ${chat.sendDate}")
