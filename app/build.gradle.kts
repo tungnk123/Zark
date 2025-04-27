@@ -139,4 +139,5 @@ dependencies {
 
     // SignalR
     implementation(libs.signalr)
+    implementation(libs.signalrkore)
 }
