@@ -42,7 +42,7 @@ class LoginViewModel @Inject constructor(
                 val response = userRepository.loginUser(
                     LoginRequest(_uiState.value.email, _uiState.value.password)
                 )
-                tokenManager.saveToken(response.token)
+                tokenManager.saveLoginResponse(response)
                 _uiState.update { it.copy(isSuccessLogin = true) }
             }
             catch (e: Exception) {

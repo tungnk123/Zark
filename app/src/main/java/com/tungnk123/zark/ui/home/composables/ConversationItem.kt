@@ -33,7 +33,7 @@ import com.tungnk123.zark.ui.theme.c_848484
 import java.time.LocalDateTime
 
 @Composable
-fun ChatItem(
+fun ConversationItem(
     name: String,
     logoUrl: Uri? = null,
     lastMessage: String,
@@ -111,7 +111,7 @@ fun ChatItem(
 @Preview(showBackground = true)
 @Composable
 fun ChatItemPreview() {
-    ChatItem(
+    ConversationItem(
         name = "John Doe",
         lastMessage = "Hello, how are you?",
         lastChatTime = LocalDateTime.now(),

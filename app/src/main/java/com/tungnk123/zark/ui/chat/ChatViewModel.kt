@@ -4,18 +4,29 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tungnk123.zark.data.dto.message.ChatMessageResponse
 import com.tungnk123.zark.repository.message.MessageRepository
+import com.tungnk123.zark.utils.AppConstants
+import com.tungnk123.zark.utils.TokenManager
 import com.tungnk123.zark.utils.extensions.printException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val messageRepository: MessageRepository
+    private val messageRepository: MessageRepository,
+    private val tokenManager: TokenManager
 ) : ViewModel() {
+    val currentUserId = tokenManager.userId.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(AppConstants.STOP_TIMEOUT),
+        initialValue = null
+    )
 
     private val _incomingMessages = MutableStateFlow<List<ChatMessageResponse>>(emptyList())
     val incomingMessages: StateFlow<List<ChatMessageResponse>> get() = _incomingMessages
@@ -50,14 +61,30 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    fun getAllMessages(
+        conversationId: Int,
+        page: Int? = null,
+        size: Int? = null
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val messages = messageRepository.getAllMessages(conversationId, page, size)
+                _chatList.value = messages
+            }
+            catch (e: Exception) {
+                e.printException(TAG)
+            }
+        }
+    }
+
     fun sendMessage(
         conversationId: Int,
-        senderId: Int,
         content: String,
         type: String = "Text"
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                val senderId = tokenManager.userId.firstOrNull() ?: return@launch
                 messageRepository.sendMessage(
                     conversationId = conversationId,
                     senderId = senderId,
