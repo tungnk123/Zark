@@ -21,8 +21,8 @@ import androidx.navigation.NavController
 import com.tungnk123.zark.ui.common.SearchBar
 import com.tungnk123.zark.ui.home.composables.ChatTopBar
 import com.tungnk123.zark.ui.home.composables.SwipeChatItem
-import com.tungnk123.zark.ui.navigation.NavigationBarMetadataItem
-import com.tungnk123.zark.utils.extensions.navigateToDestination
+import com.tungnk123.zark.utils.extensions.navigateToChat
+import com.tungnk123.zark.utils.extensions.printException
 
 @Composable
 fun HomeScreen(
@@ -73,7 +73,12 @@ fun HomeScreen(
                     lastChatTime = item.lastMessageAt,
                     isSeen = false,
                     onChatItemClick = {
-                        navController.navigateToDestination(NavigationBarMetadataItem.Chat)
+                        try {
+                            navController.navigateToChat(item.conversationId)
+                        }
+                        catch (e: Exception) {
+                            e.printException("HomeScreen")
+                        }
                     },
                     logoUrl = null,
                     onNotify = {},

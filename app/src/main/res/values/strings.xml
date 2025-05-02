@@ -30,4 +30,5 @@
     <string name="msg_archive">Lưu trữ</string>
     <string name="msg_unread">Chưa đọc</string>
     <string name="msg_pin">Ghim</string>
+    <string name="msg_send_message">Send Message</string>
 </resources>

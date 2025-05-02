@@ -9,9 +9,10 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor() : ViewModel() {
+class MainViewModel @Inject constructor(
+) : ViewModel() {
     private val _currentTab: MutableStateFlow<NavigationBarMetadataItem> =
-        MutableStateFlow(NavigationBarMetadataItem.Chat)
+        MutableStateFlow(NavigationBarMetadataItem.Home)
 
     val currentTab = _currentTab.asStateFlow()
 

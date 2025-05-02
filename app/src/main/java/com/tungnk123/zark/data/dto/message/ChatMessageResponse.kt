@@ -11,8 +11,8 @@ data class ChatMessageResponse(
     val userSendId: Int,
     val senderDisplayName: String,
     val message: String,
-    val mediaLink: String,
     val type: String,
     @Serializable(with = LocalDateTimeSerializer::class)
-    val sendDate: LocalDateTime
+    val sendDate: LocalDateTime,
+    val mediaLink: String? = null,
 )

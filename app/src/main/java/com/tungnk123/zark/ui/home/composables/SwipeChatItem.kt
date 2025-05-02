@@ -139,7 +139,7 @@ fun SwipeChatItem(
                 )
             }
         }
-        ChatItem(
+        ConversationItem(
             name = name,
             lastMessage = lastMessage,
             logoUrl = logoUrl,

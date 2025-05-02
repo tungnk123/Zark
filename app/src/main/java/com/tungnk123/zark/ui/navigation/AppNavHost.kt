@@ -3,7 +3,9 @@ package com.tungnk123.zark.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
+import androidx.navigation.navArgument
 import com.tungnk123.zark.ui.calendar.CalendarScreen
 import com.tungnk123.zark.ui.chat.ChatScreen
 import com.tungnk123.zark.ui.home.HomeScreen
@@ -37,11 +39,18 @@ fun AppNavHost(
                 navController = navController
             )
         }
-        baseComposable(NavigationBarMetadataItem.Chat) {
+        baseComposable(
+            item = NavigationBarMetadataItem.Chat, arguments = listOf(
+                navArgument("conversationId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val conversationId =
+                backStackEntry.arguments?.getInt("conversationId") ?: return@baseComposable
             ChatScreen(
-                navController = navController
+                navController = navController,
+                conversationId = conversationId,
             )
         }
+
         baseComposable(NavigationBarMetadataItem.Calendar) {
             CalendarScreen(
                 navController = navController

@@ -3,6 +3,7 @@ package com.tungnk123.zark.ui.navigation
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.runtime.Composable
+import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination
 import androidx.navigation.NavGraphBuilder
@@ -12,10 +13,12 @@ import kotlinx.serialization.serializer
 
 fun NavGraphBuilder.baseComposable(
     item: NavigationBarMetadataItem,
+    arguments: List<NamedNavArgument> = emptyList(),
     content: @Composable (AnimatedContentScope.(NavBackStackEntry) -> Unit),
 ) {
     composable(
         route = item.navigationRoute.route,
+        arguments = arguments
 //        popEnterTransition = {
 //            when {
 //                isInitialRoute<NavigationRoute.SearchView>() -> ScaleTransition.scaleUp.enterTransition()

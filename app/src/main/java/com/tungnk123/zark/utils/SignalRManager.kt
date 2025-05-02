@@ -31,6 +31,7 @@ class SignalRManager @Inject constructor(
 
     private var hubConnection: HubConnection? = null
     private var connectionJob: Job? = null
+    private var messageListenerJob: Job? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     private var onReceiveMessage: ((conversationId: Int, senderId: Int, content: String, type: String, sendDate: String) -> Unit)? =
@@ -60,7 +61,9 @@ class SignalRManager @Inject constructor(
 
         observeConnectionState()
 
-        coroutineScope.launch {
+        messageListenerJob?.cancel()
+        messageListenerJob = null
+        messageListenerJob = coroutineScope.launch {
             hubConnection?.on(
                 RECEIVE_MESSAGE,
                 paramType1 = Int::class,

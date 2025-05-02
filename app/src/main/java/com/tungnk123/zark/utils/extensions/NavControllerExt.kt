@@ -6,3 +6,8 @@ import com.tungnk123.zark.ui.navigation.NavigationBarMetadataItem
 fun NavController.navigateToDestination(destination: NavigationBarMetadataItem) {
     this.navigate(destination.navigationRoute.route)
 }
+
+fun NavController.navigateToChat(conversationId: Int) {
+    val route = "chat/$conversationId"
+    this.navigate(route)
+}

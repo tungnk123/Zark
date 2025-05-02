@@ -4,11 +4,10 @@ import com.tungnk123.zark.data.dto.message.ChatMessageResponse
 
 interface MessageRepository {
 
-    suspend fun getChatHistory(
-        senderId: Int,
-        receiverId: Int,
-        page: Int,
-        size: Int
+    suspend fun getAllMessages(
+        conversationId: Int,
+        page: Int?,
+        size: Int?
     ): List<ChatMessageResponse>
 
     suspend fun startSignalRConnection(

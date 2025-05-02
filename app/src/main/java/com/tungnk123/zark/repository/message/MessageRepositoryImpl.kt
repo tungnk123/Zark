@@ -14,14 +14,11 @@ class MessageRepositoryImpl @Inject constructor(
     private val signalRManager: SignalRManager
 ) : MessageRepository {
 
-    override suspend fun getChatHistory(
-        senderId: Int,
-        receiverId: Int,
-        page: Int,
-        size: Int
-    ): List<ChatMessageResponse> {
-        return messageService.getMessages(senderId, page, size)
-    }
+    override suspend fun getAllMessages(
+        conversationId: Int,
+        page: Int?,
+        size: Int?
+    ) = messageService.getMessages(conversationId, page, size)
 
     override suspend fun startSignalRConnection(
         onReceiveMessage: (ChatMessageResponse) -> Unit,
