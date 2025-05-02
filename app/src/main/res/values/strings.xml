@@ -31,4 +31,8 @@
     <string name="msg_unread">Chưa đọc</string>
     <string name="msg_pin">Ghim</string>
     <string name="msg_send_message">Send Message</string>
+    <string name="msg_back">Back</string>
+    <string name="msg_phone_call">Phone Call</string>
+    <string name="msg_video_call">Video Call</string>
+    <string name="msg_info">Info</string>
 </resources>
