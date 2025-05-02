@@ -7,7 +7,7 @@ object AppConstants {
     const val STOP_TIMEOUT = 5_000L
     const val DELAY_AUTO_SCROLL = 100L
     val navigationTabs = listOf(
-        NavigationBarMetadataItem.Chat,
+        NavigationBarMetadataItem.Home,
         NavigationBarMetadataItem.Calendar,
         NavigationBarMetadataItem.Workplace,
         NavigationBarMetadataItem.Document,

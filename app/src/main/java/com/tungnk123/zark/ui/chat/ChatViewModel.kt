@@ -7,6 +7,7 @@ import com.tungnk123.zark.repository.message.MessageRepository
 import com.tungnk123.zark.utils.AppConstants
 import com.tungnk123.zark.utils.TokenManager
 import com.tungnk123.zark.utils.extensions.printException
+import com.tungnk123.zark.utils.extensions.printLog
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

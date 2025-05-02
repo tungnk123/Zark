@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.tungnk123.zark.ui.navigation.AppNavHost
 import com.tungnk123.zark.ui.navigation.BottomNavigationBar
@@ -24,6 +25,11 @@ fun ZarkApp(
 ) {
     val navController = rememberNavController()
     val currentTab by viewModel.currentTab.collectAsStateWithLifecycle()
+    val currentBackStackEntry = navController.currentBackStackEntryAsState().value
+    val currentRoute = currentBackStackEntry?.destination?.route
+
+    val tabRoutes = AppConstants.navigationTabs.map { it.navigationRoute.route }
+    val shouldShowBottomBar = currentRoute in tabRoutes
 
     ZarkTheme {
         Surface {
@@ -31,25 +37,27 @@ fun ZarkApp(
                 modifier = modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.surface),
-                topBar = {},
                 bottomBar = {
-                    BottomNavigationBar(
-                        currentTab = currentTab,
-                        onTabSelected = {
-                            viewModel.updateCurrentTab(it)
-                            navController.navigate(it.navigationRoute.route) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    saveState = true
+                    if (shouldShowBottomBar) {
+                        BottomNavigationBar(
+                            currentTab = currentTab, onTabSelected = {
+                                viewModel.updateCurrentTab(it)
+                                navController.navigate(it.navigationRoute.route) {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        tabItemsList = AppConstants.navigationTabs
-                    )
+                            }, tabItemsList = AppConstants.navigationTabs
+                        )
+                    }
                 }) { contentPaddings ->
                 AppNavHost(
-                    navController = navController, modifier = Modifier.padding(contentPaddings)
+                    navController = navController,
+                    modifier = Modifier
+                        .padding(contentPaddings)
+                        .fillMaxSize()
                 )
             }
         }

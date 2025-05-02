@@ -17,8 +17,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -41,6 +52,7 @@ import com.tungnk123.zark.utils.AppConstants
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
     conversationId: Int,
@@ -70,82 +82,127 @@ fun ChatScreen(
         }
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp)
-    ) {
-        LazyColumn(
-            modifier = Modifier.weight(1f), state = listState
-        ) {
-            items(chatList) { chat ->
-                AnimatedVisibility(
-                    visible = true, enter = fadeIn(), exit = fadeOut()
-                ) {
-                    MessageItem(chat, isMe = chat.userSendId == currentUserId)
-                }
-            }
-            items(incomingMessages) { chat ->
-                AnimatedVisibility(
-                    visible = true, enter = fadeIn(), exit = fadeOut()
-                ) {
-                    MessageItem(chat, isMe = chat.userSendId == currentUserId)
-                }
-            }
-            if (isTyping) {
-                item {
-                    TypingIndicator()
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp), verticalAlignment = Alignment.CenterVertically
-        ) {
-            BasicTextField(
-                value = message,
-                onValueChange = {
-                    message = it
-                    isTyping = it.isNotBlank()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                windowInsets = androidx.compose.foundation.layout.WindowInsets(0),
+                title = {
+                    Text(
+                        text = "Xuân Anh",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 },
-                modifier = Modifier
-                    .weight(1f)
-                    .background(Color(0xFFF0F0F0), RoundedCornerShape(16.dp))
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Button(
-                onClick = {
-                    if (isConnected && message.isNotBlank()) {
-                        chatViewModel.sendMessage(
-                            conversationId = conversationId, content = message
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back"
                         )
-                        message = ""
-                        isTyping = false
                     }
-                }) {
-                Text(stringResource(R.string.msg_send_message))
-            }
-        }
-
-        Button(
-            onClick = {
-                if (isConnected) {
-                    chatViewModel.stopConnection()
-                }
-                else {
-                    chatViewModel.startConnection()
-                }
-            },
+                },
+                actions = {
+                    IconButton(onClick = { /* Call action */ }) {
+                        Icon(
+                            Icons.Default.Call,
+                            contentDescription = "Call"
+                        )
+                    }
+                    IconButton(onClick = { /* Info action */ }) {
+                        Icon(
+                            Icons.Default.Info,
+                            contentDescription = "Info"
+                        )
+                    }
+                    IconButton(onClick = { /* More options */ }) {
+                        Icon(
+                            Icons.Default.MoreVert,
+                            contentDescription = "More"
+                        )
+                    }
+                })
+        },
+        modifier = modifier.fillMaxSize(),
+    ) { padding ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
+                .padding(padding)
+                .padding(8.dp)
         ) {
-            Text(if (isConnected) "Disconnect" else "Connect")
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                state = listState
+            ) {
+                items(chatList.reversed()) { chat ->
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        MessageItem(
+                            chat,
+                            isMe = chat.userSendId == currentUserId
+                        )
+                    }
+                }
+                items(incomingMessages) { chat ->
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        MessageItem(
+                            chat,
+                            isMe = chat.userSendId == currentUserId
+                        )
+                    }
+                }
+                if (isTyping) {
+                    item { TypingIndicator() }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BasicTextField(
+                    value = message,
+                    onValueChange = {
+                        message = it
+                        isTyping = it.isNotBlank()
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .background(
+                            Color(0xFFF0F0F0),
+                            RoundedCornerShape(16.dp)
+                        )
+                        .padding(
+                            horizontal = 16.dp,
+                            vertical = 12.dp
+                        )
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    onClick = {
+                        if (isConnected && message.isNotBlank()) {
+                            chatViewModel.sendMessage(
+                                conversationId = conversationId,
+                                content = message
+                            )
+                            message = ""
+                            isTyping = false
+                        }
+                    }) {
+                    Text(stringResource(R.string.msg_send_message))
+                }
+            }
         }
     }
 }
+

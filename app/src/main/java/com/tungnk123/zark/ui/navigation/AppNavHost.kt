@@ -46,7 +46,8 @@ fun AppNavHost(
             val conversationId =
                 backStackEntry.arguments?.getInt("conversationId") ?: return@baseComposable
             ChatScreen(
-                navController = navController, conversationId = conversationId
+                navController = navController,
+                conversationId = conversationId,
             )
         }
 
