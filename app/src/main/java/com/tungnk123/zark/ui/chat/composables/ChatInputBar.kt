@@ -10,9 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Close
@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.tungnk123.zark.R
 import com.tungnk123.zark.ui.theme.c_1B56FD
 import com.tungnk123.zark.ui.theme.c_848484
+import com.tungnk123.zark.ui.theme.c_BABFC4
 import com.tungnk123.zark.ui.theme.c_F6F6F6
 
 @Composable
@@ -43,7 +45,6 @@ fun ChatInputBar(
     onMessageChange: (String) -> Unit,
     placeholder: String,
     onSendClick: () -> Unit,
-    isConnected: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -77,17 +78,21 @@ fun ChatInputBar(
                     placeholder,
                     style = MaterialTheme.typography.bodyMedium.copy(
                         color = c_848484,
-                        fontSize = 13.sp
+                        fontSize = 16.sp
                     )
                 )
             },
             shape = RoundedCornerShape(8.dp),
-            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default,
             colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 focusedContainerColor = Color.White,
                 unfocusedContainerColor = Color.White,
+            ),
+            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                color = Color.Black,
+                fontSize = 16.sp
             ),
             modifier = modifier
                 .fillMaxWidth(),
@@ -97,47 +102,52 @@ fun ChatInputBar(
         ) {
 
             IconButton(onClick = { /* emoji */ }) {
-                Text(
-                    "😊",
+                Icon(
+                    painter = painterResource(R.drawable.ic_icon_picker),
+                    contentDescription = null
                 )
             }
             IconButton(onClick = { /* mention */ }) {
-                Text(
-                    "@",
-                )
-            }
-            IconButton(onClick = { /* mic */ }) {
-                Text(
-                    "🎤",
+                Icon(
+                    painter = painterResource(R.drawable.ic_acong),
+                    contentDescription = null
                 )
             }
             IconButton(onClick = { /* image */ }) {
-                Text(
-                    "🖼",
+                Icon(
+                    painter = painterResource(R.drawable.ic_image),
+                    contentDescription = null
+                )
+            }
+            IconButton(onClick = { /* mic */ }) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_mic),
+                    contentDescription = null
                 )
             }
             IconButton(onClick = { /* text style */ }) {
-                Text(
-                    "Aa",
+                Icon(
+                    painter = painterResource(R.drawable.ic_color_format),
+                    contentDescription = null
                 )
             }
             IconButton(onClick = { /* more */ }) {
-                Text(
-                    "+",
+                Icon(
+                    painter = painterResource(R.drawable.ic_plus_circle),
+                    contentDescription = null
                 )
             }
 
             Spacer(Modifier.weight(1f))
 
-            IconButton(onClick = {
-                if (isConnected && message.isNotBlank()) {
-                    onSendClick()
-                }
-            }) {
+            IconButton(
+                onClick = onSendClick,
+                enabled = message.isNotEmpty()
+            ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Send",
-                    tint = c_1B56FD
+                    tint = if (message.isEmpty()) c_BABFC4 else c_1B56FD,
                 )
             }
         }
@@ -154,6 +164,5 @@ fun ChatInputBarPreview() {
         onMessageChange = setText,
         placeholder = "Chat something",
         onSendClick = {},
-        isConnected = true
     )
 }
