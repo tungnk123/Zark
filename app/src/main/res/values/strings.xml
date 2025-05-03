@@ -35,4 +35,5 @@
     <string name="msg_phone_call">Phone Call</string>
     <string name="msg_video_call">Video Call</string>
     <string name="msg_info">Info</string>
+    <string name="msg_jump_to_bottom">Jump to bottom</string>
 </resources>

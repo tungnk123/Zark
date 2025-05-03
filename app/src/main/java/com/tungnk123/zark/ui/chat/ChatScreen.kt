@@ -2,7 +2,10 @@ package com.tungnk123.zark.ui.chat
 
 import MessageItem
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,13 +14,16 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,13 +32,15 @@ import com.tungnk123.zark.ui.chat.composables.ChatInputBar
 import com.tungnk123.zark.ui.chat.composables.ChatTopBar
 import com.tungnk123.zark.ui.chat.composables.TypingIndicator
 import com.tungnk123.zark.ui.common.DateHeader
+import com.tungnk123.zark.ui.common.JumpToBottom
 import com.tungnk123.zark.utils.AppConstants
-import com.tungnk123.zark.utils.extensions.printLog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class,
+    ExperimentalLayoutApi::class
+)
 @Composable
 fun ChatScreen(
     conversationId: Int,
@@ -56,18 +64,32 @@ fun ChatScreen(
 
     var message by remember { mutableStateOf("") }
     var isTyping by remember { mutableStateOf(false) }
-    val listState = rememberLazyListState()
+    val listState = rememberLazyListState(
+        initialFirstVisibleItemIndex = allMessages.size
+    )
     val coroutineScope = rememberCoroutineScope()
+
+    val jumpToBottomButtonEnabled by remember {
+        derivedStateOf {
+            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+            val totalItemsCount = listState.layoutInfo.totalItemsCount
+            lastVisibleItem != null && lastVisibleItem < totalItemsCount - 1
+        }
+    }
+    var showJumpToBottom by remember { mutableStateOf(false) }
+
+    LaunchedEffect(allMessages.size) {
+        delay(500)
+        showJumpToBottom = true
+    }
 
     LaunchedEffect(Unit) {
         chatViewModel.getAllMessages(conversationId = conversationId)
     }
 
-    LaunchedEffect(chatList.size + incomingMessages.size) {
-        val listSize = chatList.size + incomingMessages.size
+    LaunchedEffect(allMessages.size) {
         coroutineScope.launch {
-            delay(AppConstants.DELAY_AUTO_SCROLL)
-            listState.animateScrollToItem(listSize)
+            listState.animateScrollToItem(allMessages.size)
         }
     }
 
@@ -108,7 +130,8 @@ fun ChatScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(8.dp)
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LazyColumn(
                 modifier = Modifier.weight(1f),
@@ -129,7 +152,19 @@ fun ChatScreen(
                     item { TypingIndicator() }
                 }
             }
+
+            if (showJumpToBottom && !WindowInsets.isImeVisible) {
+                JumpToBottom(
+                    enabled = jumpToBottomButtonEnabled,
+                    onClicked = {
+                        val listSize = chatList.size + incomingMessages.size
+                        coroutineScope.launch {
+                            delay(AppConstants.DELAY_AUTO_SCROLL)
+                            listState.animateScrollToItem(listSize)
+                        }
+                    },
+                )
+            }
         }
     }
 }
-
