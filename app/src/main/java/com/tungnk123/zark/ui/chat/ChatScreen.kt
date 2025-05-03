@@ -1,9 +1,6 @@
 package com.tungnk123.zark.ui.chat
 
 import MessageItem
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -28,9 +25,12 @@ import androidx.navigation.NavController
 import com.tungnk123.zark.ui.chat.composables.ChatInputBar
 import com.tungnk123.zark.ui.chat.composables.ChatTopBar
 import com.tungnk123.zark.ui.chat.composables.TypingIndicator
+import com.tungnk123.zark.ui.common.DateHeader
 import com.tungnk123.zark.utils.AppConstants
+import com.tungnk123.zark.utils.extensions.printLog
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +44,15 @@ fun ChatScreen(
     val isConnected by chatViewModel.isConnected.collectAsStateWithLifecycle()
     val chatList by chatViewModel.chatList.collectAsStateWithLifecycle()
     val currentUserId by chatViewModel.currentUserId.collectAsStateWithLifecycle()
+
+    val allMessages = remember(
+        chatList,
+        incomingMessages
+    ) {
+        (chatList + incomingMessages).sortedBy { it.sendDate }
+    }
+
+    var lastMessageDateTime: LocalDateTime? = null
 
     var message by remember { mutableStateOf("") }
     var isTyping by remember { mutableStateOf(false) }
@@ -103,31 +112,18 @@ fun ChatScreen(
         ) {
             LazyColumn(
                 modifier = Modifier.weight(1f),
-                state = listState
+                state = listState,
             ) {
-                items(chatList.reversed()) { chat ->
-                    AnimatedVisibility(
-                        visible = true,
-                        enter = fadeIn(),
-                        exit = fadeOut()
-                    ) {
-                        MessageItem(
-                            chat,
-                            isMe = chat.userSendId == currentUserId
-                        )
+                items(allMessages) { chat ->
+                    val currentMessageDate = chat.sendDate
+                    if (lastMessageDateTime?.dayOfYear != currentMessageDate.dayOfYear) {
+                        lastMessageDateTime = currentMessageDate
+                        DateHeader(chat.sendDate)
                     }
-                }
-                items(incomingMessages) { chat ->
-                    AnimatedVisibility(
-                        visible = true,
-                        enter = fadeIn(),
-                        exit = fadeOut()
-                    ) {
-                        MessageItem(
-                            chat,
-                            isMe = chat.userSendId == currentUserId
-                        )
-                    }
+                    MessageItem(
+                        chat = chat,
+                        isMe = chat.userSendId == currentUserId
+                    )
                 }
                 if (isTyping) {
                     item { TypingIndicator() }

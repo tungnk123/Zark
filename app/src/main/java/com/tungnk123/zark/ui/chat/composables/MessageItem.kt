@@ -102,7 +102,6 @@ fun MessageItem(
                     color = c_848484
                 )
             }
-            Spacer(modifier = Modifier.height(4.dp))
         }
     }
 }
