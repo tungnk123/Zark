@@ -14,5 +14,7 @@ data class ChatMessageResponse(
     val type: String,
     @Serializable(with = LocalDateTimeSerializer::class)
     val sendDate: LocalDateTime,
+    val isSeen: Boolean = false,
+    val isPinned: Boolean = false,
     val mediaLink: String? = null,
 )
