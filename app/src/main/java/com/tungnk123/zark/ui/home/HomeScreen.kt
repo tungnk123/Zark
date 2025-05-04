@@ -22,7 +22,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.tungnk123.zark.ui.home.composables.HomeTopBar
 import com.tungnk123.zark.ui.home.composables.SwipeChatItem
+import com.tungnk123.zark.ui.navigation.NavigationBarMetadataItem
 import com.tungnk123.zark.utils.extensions.navigateToChat
+import com.tungnk123.zark.utils.extensions.navigateToDestination
 import com.tungnk123.zark.utils.extensions.printException
 
 @Composable
@@ -49,7 +51,9 @@ fun HomeScreen(
         topBar = {
             HomeTopBar(
                 onAppLogoClick = {},
-                onSearchClick = {},
+                onSearchClick = {
+                    navController.navigateToDestination(NavigationBarMetadataItem.Search)
+                },
                 onMoreClick = {}
             )
         },
@@ -94,7 +98,6 @@ fun HomeScreen(
                         onMarkUnread = {},
                     )
                 }
-
             }
         }
     }
