@@ -1,9 +1,7 @@
 package com.tungnk123.zark.ui.home
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,9 +12,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,8 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.tungnk123.zark.ui.common.SearchBar
-import com.tungnk123.zark.ui.home.composables.ChatTopBar
+import com.tungnk123.zark.ui.home.composables.HomeTopBar
 import com.tungnk123.zark.ui.home.composables.SwipeChatItem
 import com.tungnk123.zark.utils.extensions.navigateToChat
 import com.tungnk123.zark.utils.extensions.printException
@@ -38,10 +33,6 @@ fun HomeScreen(
 ) {
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
-
-    var query by remember {
-        mutableStateOf("")
-    }
 
     LaunchedEffect(Unit) {
         homeViewModel.fetchConversations()
@@ -56,9 +47,10 @@ fun HomeScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            ChatTopBar(
+            HomeTopBar(
                 onAppLogoClick = {},
-                onEditClick = { }
+                onSearchClick = {},
+                onMoreClick = {}
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
@@ -80,18 +72,6 @@ fun HomeScreen(
                     .padding(contentPaddings)
                     .padding(horizontal = 16.dp)
             ) {
-                item {
-                    SearchBar(
-                        query = query,
-                        onQueryChanged = { newQuery ->
-                            query = newQuery
-                        },
-                        onClearQuery = {
-                            query = ""
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(14.dp))
-                }
                 items(uiState.contacts) { item ->
                     SwipeChatItem(
                         name = item.name,

@@ -41,5 +41,6 @@
     <string name="emojis_label">Emojis</string>
     <string name="stickers_label">Stickers</string>
     <string name="emoji_selector_desc">Emoji selector</string>
+    <string name="msg_plus_icon">Plus icon</string>
 
 </resources>
