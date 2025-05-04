@@ -5,20 +5,16 @@ import com.tungnk123.zark.R
 
 enum class NavigationBarMetadataItem(
     val labelResId: String,
-    @DrawableRes val selectedIconRes: Int,
-    @DrawableRes val unselectedIconRes: Int,
     val navigationRoute: NavigationRoute,
+    @DrawableRes val selectedIconRes: Int? = null,
+    @DrawableRes val unselectedIconRes: Int? = null,
 ) {
     Login(
         labelResId = NavigationRoute.Login.name,
-        selectedIconRes = R.drawable.ic_chat_selected,
-        unselectedIconRes = R.drawable.ic_chat,
         navigationRoute = NavigationRoute.Login
     ),
     SignIn(
         labelResId = NavigationRoute.SignIn.name,
-        selectedIconRes = R.drawable.ic_chat_selected,
-        unselectedIconRes = R.drawable.ic_chat,
         navigationRoute = NavigationRoute.SignIn
     ),
     Home(
@@ -27,10 +23,12 @@ enum class NavigationBarMetadataItem(
         unselectedIconRes = R.drawable.ic_chat,
         navigationRoute = NavigationRoute.Home
     ),
+    Search(
+        labelResId = NavigationRoute.Search.name,
+        navigationRoute = NavigationRoute.Search
+    ),
     Chat(
         labelResId = NavigationRoute.Chat.name,
-        selectedIconRes = R.drawable.ic_chat_selected,
-        unselectedIconRes = R.drawable.ic_chat,
         navigationRoute = NavigationRoute.Chat
     ),
     Calendar(

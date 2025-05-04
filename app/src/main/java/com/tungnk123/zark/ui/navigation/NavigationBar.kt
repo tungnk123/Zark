@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.tungnk123.zark.R
 import com.tungnk123.zark.ui.theme.c_4A86F7
 import com.tungnk123.zark.ui.theme.c_848484
 
@@ -51,8 +52,14 @@ fun BottomNavigationBar(
                             label = "bottom-bar-${tab.navigationRoute}",
                             targetState = isSelected
                         ) {
+                            val iconRes = if (it) {
+                                tab.selectedIconRes ?: R.drawable.ic_chat_selected
+                            }
+                            else {
+                                tab.unselectedIconRes ?: R.drawable.ic_chat
+                            }
                             Image(
-                                painter = painterResource(if (it) tab.selectedIconRes else tab.unselectedIconRes),
+                                painter = painterResource(iconRes),
                                 contentDescription = tab.navigationRoute.route,
                                 modifier = Modifier
                                     .width(20.dp)
