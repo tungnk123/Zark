@@ -4,17 +4,19 @@ import MessageItem
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.isImeVisible
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,9 +33,6 @@ import com.tungnk123.zark.ui.chat.composables.ChatInputBar
 import com.tungnk123.zark.ui.chat.composables.ChatTopBar
 import com.tungnk123.zark.ui.chat.composables.TypingIndicator
 import com.tungnk123.zark.ui.common.DateHeader
-import com.tungnk123.zark.ui.common.JumpToBottom
-import com.tungnk123.zark.utils.AppConstants
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
@@ -68,20 +66,6 @@ fun ChatScreen(
         initialFirstVisibleItemIndex = allMessages.size
     )
     val coroutineScope = rememberCoroutineScope()
-
-    val jumpToBottomButtonEnabled by remember {
-        derivedStateOf {
-            val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
-            val totalItemsCount = listState.layoutInfo.totalItemsCount
-            lastVisibleItem != null && lastVisibleItem < totalItemsCount - 1
-        }
-    }
-    var showJumpToBottom by remember { mutableStateOf(false) }
-
-    LaunchedEffect(allMessages.size) {
-        delay(500)
-        showJumpToBottom = true
-    }
 
     LaunchedEffect(Unit) {
         chatViewModel.getAllMessages(conversationId = conversationId)
@@ -123,6 +107,10 @@ fun ChatScreen(
                 },
             )
         },
+        contentWindowInsets = ScaffoldDefaults
+            .contentWindowInsets
+            .exclude(WindowInsets.navigationBars)
+            .exclude(WindowInsets.ime),
         modifier = modifier
             .fillMaxSize(),
         containerColor = Color.White
@@ -151,19 +139,6 @@ fun ChatScreen(
                 if (isTyping) {
                     item { TypingIndicator() }
                 }
-            }
-
-            if (showJumpToBottom && !WindowInsets.isImeVisible) {
-                JumpToBottom(
-                    enabled = jumpToBottomButtonEnabled,
-                    onClicked = {
-                        val listSize = chatList.size + incomingMessages.size
-                        coroutineScope.launch {
-                            delay(AppConstants.DELAY_AUTO_SCROLL)
-                            listState.animateScrollToItem(listSize)
-                        }
-                    },
-                )
             }
         }
     }

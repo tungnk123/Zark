@@ -36,4 +36,10 @@
     <string name="msg_video_call">Video Call</string>
     <string name="msg_info">Info</string>
     <string name="msg_jump_to_bottom">Jump to bottom</string>
+    <string name="not_available">Functionality currently not available</string>
+    <string name="not_available_subtitle">Grab a beverage and check back later!</string>
+    <string name="emojis_label">Emojis</string>
+    <string name="stickers_label">Stickers</string>
+    <string name="emoji_selector_desc">Emoji selector</string>
+
 </resources>
