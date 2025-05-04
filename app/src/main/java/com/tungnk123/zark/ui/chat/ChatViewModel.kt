@@ -4,17 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tungnk123.zark.data.dto.message.ChatMessageResponse
 import com.tungnk123.zark.repository.message.MessageRepository
-import com.tungnk123.zark.utils.AppConstants
 import com.tungnk123.zark.utils.TokenManager
 import com.tungnk123.zark.utils.extensions.printException
-import com.tungnk123.zark.utils.extensions.printLog
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -58,32 +54,67 @@ class ChatViewModel @Inject constructor(
                     }
                 )
                 updateState { copy(isConnected = true) }
-            } catch (e: Exception) {
+            }
+            catch (e: Exception) {
                 e.printException(TAG)
                 updateState { copy(error = e.message) }
             }
         }
     }
 
-    fun getAllMessages(conversationId: Int, page: Int? = null, size: Int? = null) {
+    fun getAllMessages(
+        conversationId: Int,
+        page: Int? = null,
+        size: Int? = null
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
-            updateState { copy(isLoading = true, error = null) }
+            updateState {
+                copy(
+                    isLoading = true,
+                    error = null
+                )
+            }
             try {
-                val messages = messageRepository.getAllMessages(conversationId, page, size)
-                updateState { copy(chatList = messages, isLoading = false) }
-            } catch (e: Exception) {
+                val messages = messageRepository.getAllMessages(
+                    conversationId,
+                    page,
+                    size
+                )
+                updateState {
+                    copy(
+                        chatList = messages,
+                        isLoading = false
+                    )
+                }
+            }
+            catch (e: Exception) {
                 e.printException(TAG)
-                updateState { copy(isLoading = false, error = e.message) }
+                updateState {
+                    copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
             }
         }
     }
 
-    fun sendMessage(conversationId: Int, content: String, type: String = "Text") {
+    fun sendMessage(
+        conversationId: Int,
+        content: String,
+        type: String = "Text"
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val senderId = _uiState.value.currentUserId ?: return@launch
-                messageRepository.sendMessage(conversationId, senderId, content, type)
-            } catch (e: Exception) {
+                messageRepository.sendMessage(
+                    conversationId,
+                    senderId,
+                    content,
+                    type
+                )
+            }
+            catch (e: Exception) {
                 e.printException(TAG)
                 updateState { copy(error = e.message) }
             }
