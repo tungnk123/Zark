@@ -23,78 +23,69 @@ class ChatViewModel @Inject constructor(
     private val messageRepository: MessageRepository,
     private val tokenManager: TokenManager
 ) : ViewModel() {
-    val currentUserId = tokenManager.userId.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(AppConstants.STOP_TIMEOUT),
-        initialValue = null
-    )
 
-    private val _incomingMessages = MutableStateFlow<List<ChatMessageResponse>>(emptyList())
-    val incomingMessages: StateFlow<List<ChatMessageResponse>> get() = _incomingMessages
-
-    private val _isConnected = MutableStateFlow(false)
-    val isConnected: StateFlow<Boolean> get() = _isConnected
-
-    private val _chatList = MutableStateFlow<List<ChatMessageResponse>>(emptyList())
-    val chatList: StateFlow<List<ChatMessageResponse>> get() = _chatList
+    private val _uiState = MutableStateFlow(ChatUiState())
+    val uiState: StateFlow<ChatUiState> = _uiState
 
     companion object {
         private const val TAG = "ChatViewModel"
     }
 
     init {
+        viewModelScope.launch {
+            val userId = tokenManager.userId.firstOrNull()
+            _uiState.value = _uiState.value.copy(currentUserId = userId)
+        }
         startConnection()
+    }
+
+    private fun updateState(update: ChatUiState.() -> ChatUiState) {
+        _uiState.value = _uiState.value.update()
     }
 
     fun startConnection() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                messageRepository.startSignalRConnection(onReceiveMessage = { chatMessage ->
-                    _incomingMessages.value = _incomingMessages.value + chatMessage
-                    }, onError = {
-                    it.printException(TAG)
-                })
-                _isConnected.value = true
-            }
-            catch (e: Exception) {
+                messageRepository.startSignalRConnection(
+                    onReceiveMessage = { message ->
+                        updateState {
+                            copy(incomingMessages = incomingMessages + message)
+                        }
+                    },
+                    onError = {
+                        it.printException(TAG)
+                        updateState { copy(error = it.message) }
+                    }
+                )
+                updateState { copy(isConnected = true) }
+            } catch (e: Exception) {
                 e.printException(TAG)
+                updateState { copy(error = e.message) }
             }
         }
     }
 
-    fun getAllMessages(
-        conversationId: Int,
-        page: Int? = null,
-        size: Int? = null
-    ) {
+    fun getAllMessages(conversationId: Int, page: Int? = null, size: Int? = null) {
         viewModelScope.launch(Dispatchers.IO) {
+            updateState { copy(isLoading = true, error = null) }
             try {
                 val messages = messageRepository.getAllMessages(conversationId, page, size)
-                _chatList.value = messages
-            }
-            catch (e: Exception) {
+                updateState { copy(chatList = messages, isLoading = false) }
+            } catch (e: Exception) {
                 e.printException(TAG)
+                updateState { copy(isLoading = false, error = e.message) }
             }
         }
     }
 
-    fun sendMessage(
-        conversationId: Int,
-        content: String,
-        type: String = "Text"
-    ) {
+    fun sendMessage(conversationId: Int, content: String, type: String = "Text") {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val senderId = tokenManager.userId.firstOrNull() ?: return@launch
-                messageRepository.sendMessage(
-                    conversationId = conversationId,
-                    senderId = senderId,
-                    content = content,
-                    type = type
-                )
-            }
-            catch (e: Exception) {
+                val senderId = _uiState.value.currentUserId ?: return@launch
+                messageRepository.sendMessage(conversationId, senderId, content, type)
+            } catch (e: Exception) {
                 e.printException(TAG)
+                updateState { copy(error = e.message) }
             }
         }
     }
@@ -102,8 +93,8 @@ class ChatViewModel @Inject constructor(
     fun stopConnection() {
         viewModelScope.launch {
             messageRepository.disconnectSignalR()
+            updateState { copy(isConnected = false) }
         }
-        _isConnected.value = false
     }
 
     override fun onCleared() {
@@ -112,3 +103,11 @@ class ChatViewModel @Inject constructor(
     }
 }
 
+data class ChatUiState(
+    val currentUserId: Int? = null,
+    val chatList: List<ChatMessageResponse> = emptyList(),
+    val incomingMessages: List<ChatMessageResponse> = emptyList(),
+    val isConnected: Boolean = false,
+    val isLoading: Boolean = false,
+    val error: String? = null
+)
