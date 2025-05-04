@@ -1,17 +1,23 @@
 package com.tungnk123.zark.ui.home
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -31,12 +37,20 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
+
     var query by remember {
         mutableStateOf("")
     }
 
     LaunchedEffect(Unit) {
-        homeViewModel.loadContacts()
+        homeViewModel.fetchConversations()
+    }
+
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            snackBarHostState.showSnackbar(it)
+        }
     }
 
     Scaffold(
@@ -47,48 +61,61 @@ fun HomeScreen(
                 onEditClick = { }
             )
         },
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         containerColor = Color.White
     ) { contentPaddings ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(contentPaddings)
-                .padding(horizontal = 16.dp)
-        ) {
-            item {
-                SearchBar(
-                    query = query,
-                    onQueryChanged = { newQuery ->
-                        query = newQuery
-                    },
-                    onClearQuery = {
-                        query = ""
-                    }
-                )
-                Spacer(modifier = Modifier.height(14.dp))
+        if (uiState.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPaddings),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
             }
-            items(uiState.contacts) { item ->
-                SwipeChatItem(
-                    name = item.name,
-                    lastMessage = item.lastMessage,
-                    lastChatTime = item.lastMessageAt,
-                    isSeen = false,
-                    onChatItemClick = {
-                        try {
-                            navController.navigateToChat(item.conversationId)
+        }
+        else {
+            LazyColumn(
+                modifier = Modifier
+                    .padding(contentPaddings)
+                    .padding(horizontal = 16.dp)
+            ) {
+                item {
+                    SearchBar(
+                        query = query,
+                        onQueryChanged = { newQuery ->
+                            query = newQuery
+                        },
+                        onClearQuery = {
+                            query = ""
                         }
-                        catch (e: Exception) {
-                            e.printException("HomeScreen")
-                        }
-                    },
-                    logoUrl = null,
-                    onNotify = {},
-                    onDelete = {},
-                    onPin = {},
-                    onArchive = {},
-                    onMarkUnread = {},
-                )
-            }
+                    )
+                    Spacer(modifier = Modifier.height(14.dp))
+                }
+                items(uiState.contacts) { item ->
+                    SwipeChatItem(
+                        name = item.name,
+                        lastMessage = item.lastMessage,
+                        lastChatTime = item.lastMessageAt,
+                        isSeen = false,
+                        onChatItemClick = {
+                            try {
+                                navController.navigateToChat(item.conversationId)
+                            }
+                            catch (e: Exception) {
+                                e.printException("HomeScreen")
+                            }
+                        },
+                        logoUrl = null,
+                        onNotify = {},
+                        onDelete = {},
+                        onPin = {},
+                        onArchive = {},
+                        onMarkUnread = {},
+                    )
+                }
 
+            }
         }
     }
 }

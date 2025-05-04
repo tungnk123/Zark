@@ -2,8 +2,8 @@ package com.tungnk123.zark.ui.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tungnk123.zark.data.dto.message.ChatMessageResponse
 import com.tungnk123.zark.repository.message.MessageRepository
+import com.tungnk123.zark.ui.chat.state.ChatUiState
 import com.tungnk123.zark.utils.TokenManager
 import com.tungnk123.zark.utils.extensions.printException
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -133,12 +133,3 @@ class ChatViewModel @Inject constructor(
         stopConnection()
     }
 }
-
-data class ChatUiState(
-    val currentUserId: Int? = null,
-    val chatList: List<ChatMessageResponse> = emptyList(),
-    val incomingMessages: List<ChatMessageResponse> = emptyList(),
-    val isConnected: Boolean = false,
-    val isLoading: Boolean = false,
-    val error: String? = null
-)

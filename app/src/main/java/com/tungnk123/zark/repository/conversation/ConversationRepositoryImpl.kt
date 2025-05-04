@@ -11,4 +11,6 @@ class ConversationRepositoryImpl @Inject constructor(
         conversationDataSource.createConversation(createConversationRequest)
 
     override suspend fun getConversations() = conversationDataSource.getConversations()
+    override suspend fun searchConversationByQuery(query: String) =
+        conversationDataSource.searchConversationByQuery(query)
 }
