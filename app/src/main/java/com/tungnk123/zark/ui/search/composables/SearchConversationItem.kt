@@ -1,4 +1,4 @@
-package com.tungnk123.zark.ui.home.composables
+package com.tungnk123.zark.ui.search.composables
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
@@ -42,7 +42,6 @@ fun SearchConversationItem(
             .clickable(onClick = onChatItemClick)
             .padding(
                 vertical = 12.dp,
-                horizontal = 16.dp
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -63,7 +62,7 @@ fun SearchConversationItem(
             text = name,
             style = MaterialTheme.typography.labelMedium.copy(
                 color = Color.Black,
-                fontSize = 16.sp
+                fontSize = 14.sp
             ),
             modifier = Modifier.weight(1f)
         )

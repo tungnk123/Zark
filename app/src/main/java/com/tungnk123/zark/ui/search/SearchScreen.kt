@@ -16,14 +16,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.tungnk123.zark.ui.home.composables.SearchConversationItem
+import com.tungnk123.zark.R
+import com.tungnk123.zark.ui.search.composables.EmptySearchItem
+import com.tungnk123.zark.ui.search.composables.SearchConversationItem
 import com.tungnk123.zark.ui.search.composables.SearchTopBar
 import com.tungnk123.zark.utils.extensions.navigateToChat
 import com.tungnk123.zark.utils.extensions.printException
+import com.tungnk123.zark.utils.extensions.printLog
 
 @Composable
 fun SearchScreen(
@@ -38,6 +42,8 @@ fun SearchScreen(
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
             snackBarHostState.showSnackbar(it)
+            it.toString()
+                .printLog("test_error")
         }
     }
 
@@ -70,25 +76,35 @@ fun SearchScreen(
                 CircularProgressIndicator()
             }
         }
+        else if (uiState.searchContacts.isEmpty()) {
+            EmptySearchItem(
+                content = stringResource(R.string.msg_no_search_item),
+                modifier = Modifier.fillMaxSize()
+            )
+        }
         else {
             LazyColumn(
                 modifier = Modifier
+                    .fillMaxSize()
                     .padding(contentPaddings)
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 16.dp),
             ) {
-                items(uiState.searchContacts) { item ->
-                    SearchConversationItem(
-                        name = item.name,
-                        onChatItemClick = {
-                            try {
-                                navController.navigateToChat(item.conversationId)
-                            }
-                            catch (e: Exception) {
-                                e.printException("HomeScreen")
-                            }
-                        },
-                        logoUrl = null,
-                    )
+                if (uiState.searchContacts.isNotEmpty()) {
+                    items(uiState.searchContacts) { item ->
+                        SearchConversationItem(
+                            name = item.name.orEmpty(),
+                            onChatItemClick = {
+                                try {
+                                    item.conversationId?.let {
+                                        navController.navigateToChat(it)
+                                    }
+                                }
+                                catch (e: Exception) {
+                                    e.printException("HomeScreen")
+                                }
+                            },
+                        )
+                    }
                 }
             }
         }

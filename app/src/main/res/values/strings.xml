@@ -43,5 +43,6 @@
     <string name="emoji_selector_desc">Emoji selector</string>
     <string name="msg_plus_icon">Plus icon</string>
     <string name="msg_cancel">Hủy</string>
+    <string name="msg_no_search_item">Please search some keyword to find conversations</string>
 
 </resources>
