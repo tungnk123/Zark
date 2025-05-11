@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -79,10 +80,10 @@ fun ChatScreen(
     }
 
     LaunchedEffect(allMessages.size) {
-        coroutineScope.launch {
-            delay(100)
-            listState.animateScrollToItem(index = allMessages.size)
-        }
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo }
+            .collect {
+                listState.animateScrollToItem(allMessages.size)
+            }
     }
 
     LaunchedEffect(uiState.error) {
