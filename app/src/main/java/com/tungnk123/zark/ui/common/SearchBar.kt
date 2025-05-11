@@ -1,6 +1,5 @@
 package com.tungnk123.zark.ui.common
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -18,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tungnk123.zark.R
 import com.tungnk123.zark.ui.theme.c_848484
@@ -62,7 +62,7 @@ fun SearchBar(
                 )
             )
         },
-        shape = RoundedCornerShape(percent = 50),
+        shape = RoundedCornerShape(8.dp),
         singleLine = true,
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Color.Transparent,
@@ -70,8 +70,7 @@ fun SearchBar(
             focusedContainerColor = c_F2F2F2,
             unfocusedContainerColor = c_F2F2F2,
         ),
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier,
     )
 }
 

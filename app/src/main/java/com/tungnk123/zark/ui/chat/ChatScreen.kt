@@ -1,6 +1,7 @@
 package com.tungnk123.zark.ui.chat
 
 import MessageItem
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
@@ -12,9 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,10 +38,12 @@ import com.tungnk123.zark.ui.chat.composables.ChatInputBar
 import com.tungnk123.zark.ui.chat.composables.ChatTopBar
 import com.tungnk123.zark.ui.chat.composables.TypingIndicator
 import com.tungnk123.zark.ui.common.DateHeader
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
-@OptIn(ExperimentalMaterial3Api::class,
+@OptIn(
+    ExperimentalMaterial3Api::class,
     ExperimentalLayoutApi::class
 )
 @Composable
@@ -46,10 +53,14 @@ fun ChatScreen(
     modifier: Modifier = Modifier,
     chatViewModel: ChatViewModel = hiltViewModel()
 ) {
-    val incomingMessages by chatViewModel.incomingMessages.collectAsStateWithLifecycle()
-    val isConnected by chatViewModel.isConnected.collectAsStateWithLifecycle()
-    val chatList by chatViewModel.chatList.collectAsStateWithLifecycle()
-    val currentUserId by chatViewModel.currentUserId.collectAsStateWithLifecycle()
+    val uiState by chatViewModel.uiState.collectAsStateWithLifecycle()
+    val snackBarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    val chatList = uiState.chatList
+    val incomingMessages = uiState.incomingMessages
+    val isConnected = uiState.isConnected
+    val currentUserId = uiState.currentUserId
 
     val allMessages = remember(
         chatList,
@@ -59,21 +70,25 @@ fun ChatScreen(
     }
 
     var lastMessageDateTime: LocalDateTime? = null
-
     var message by remember { mutableStateOf("") }
     var isTyping by remember { mutableStateOf(false) }
-    val listState = rememberLazyListState(
-        initialFirstVisibleItemIndex = allMessages.size
-    )
-    val coroutineScope = rememberCoroutineScope()
+
+    val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
-        chatViewModel.getAllMessages(conversationId = conversationId)
+        chatViewModel.getAllMessages(conversationId)
     }
 
     LaunchedEffect(allMessages.size) {
-        coroutineScope.launch {
-            listState.animateScrollToItem(allMessages.size)
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo }
+            .collect {
+                listState.animateScrollToItem(allMessages.size)
+            }
+    }
+
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            snackBarHostState.showSnackbar(it)
         }
     }
 
@@ -82,10 +97,11 @@ fun ChatScreen(
             ChatTopBar(
                 navController = navController,
                 chatTitle = "$conversationId",
-                onlineStatus = "Online",
+                onlineStatus = if (isConnected) "Online" else "Offline",
                 onPhoneCallClick = {},
                 onVideoCallClick = {},
-                onInfoClick = {})
+                onInfoClick = {}
+            )
         },
         bottomBar = {
             ChatInputBar(
@@ -111,33 +127,45 @@ fun ChatScreen(
             .contentWindowInsets
             .exclude(WindowInsets.navigationBars)
             .exclude(WindowInsets.ime),
-        modifier = modifier
-            .fillMaxSize(),
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+        modifier = modifier.fillMaxSize(),
         containerColor = Color.White
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                state = listState,
+        if (uiState.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
             ) {
-                items(allMessages) { chat ->
-                    val currentMessageDate = chat.sendDate
-                    if (lastMessageDateTime?.dayOfYear != currentMessageDate.dayOfYear) {
-                        lastMessageDateTime = currentMessageDate
-                        DateHeader(chat.sendDate)
+                CircularProgressIndicator()
+            }
+        }
+        else {
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    state = listState,
+                ) {
+                    items(allMessages) { chat ->
+                        val currentMessageDate = chat.sendDate
+                        if (lastMessageDateTime?.dayOfYear != currentMessageDate.dayOfYear) {
+                            lastMessageDateTime = currentMessageDate
+                            DateHeader(chat.sendDate)
+                        }
+                        MessageItem(
+                            chat = chat,
+                            isMe = chat.userSendId == currentUserId
+                        )
                     }
-                    MessageItem(
-                        chat = chat,
-                        isMe = chat.userSendId == currentUserId
-                    )
-                }
-                if (isTyping) {
-                    item { TypingIndicator() }
+                    if (isTyping) {
+                        item { TypingIndicator() }
+                    }
                 }
             }
         }
