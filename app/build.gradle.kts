@@ -141,4 +141,8 @@ dependencies {
     // SignalR
     implementation(libs.signalr)
     implementation(libs.signalrkore)
+
+    // Calendar
+    implementation(libs.top.sheet.compose)
+    implementation("com.kizitonwose.calendar:compose:2.6.2")
 }
