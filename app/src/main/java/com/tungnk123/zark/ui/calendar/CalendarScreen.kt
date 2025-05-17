@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,7 +33,11 @@ import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
+import com.tungnk123.top_sheet.data.rememberTopSheetState
 import com.tungnk123.zark.ui.calendar.composables.CalendarTopBar
+import com.tungnk123.zark.ui.calendar.composables.CalendarType
+import com.tungnk123.zark.ui.calendar.composables.ChangeCalendarTypeTopSheet
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
@@ -45,13 +50,9 @@ fun CalendarScreen(
     modifier: Modifier = Modifier,
     calendarViewModel: CalendarViewModel = hiltViewModel()
 ) {
-    val tabItems = listOf(
-        "Lịch biểu",
-        "Ngày",
-        "3 ngày",
-        "Tháng"
-    )
-    var selectedTab by remember { mutableStateOf(0) }
+    var selectedType by remember { mutableStateOf(CalendarType.SCHEDULE) }
+    val topSheetState = rememberTopSheetState()
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         modifier = modifier,
@@ -63,21 +64,37 @@ fun CalendarScreen(
                 onSearchClick = {
                     navController
                 },
-                onChangeCalendarTypeClick = {}
+                onChangeCalendarTypeClick = {
+                    scope.launch {
+                        topSheetState.expand()
+                    }
+                }
             )
         },
         containerColor = Color.White
     ) { padding ->
         Column {
-            when (selectedTab) {
-                0 -> TimeAgendaView(modifier = Modifier.padding(padding))
-                1 -> SingleDayView(modifier = Modifier.padding(padding))
-                2 -> ThreeDayView(modifier = Modifier.padding(padding))
-                3 -> MonthCalendarView(modifier = Modifier.padding(padding))
+            when (selectedType) {
+                CalendarType.SCHEDULE -> TimeAgendaView(modifier = Modifier.padding(padding))
+                CalendarType.DAY -> SingleDayView(modifier = Modifier.padding(padding))
+                CalendarType.THREE_DAY -> ThreeDayView(modifier = Modifier.padding(padding))
+                CalendarType.WEEK -> ThreeDayView(modifier = Modifier.padding(padding)) // tạo composable này nếu cần
+                CalendarType.MONTH -> MonthCalendarView(modifier = Modifier.padding(padding))
             }
         }
     }
+    ChangeCalendarTypeTopSheet(
+        topSheetState = topSheetState,
+        selectedType = selectedType,
+        onTypeSelected = { selectedType = it },
+        onDismissRequest = {
+            scope.launch {
+                topSheetState.collapse()
+            }
+        },
+    )
 }
+
 
 @Composable
 fun TimeAgendaView(modifier: Modifier = Modifier) {
@@ -88,7 +105,7 @@ fun TimeAgendaView(modifier: Modifier = Modifier) {
                     .fillMaxWidth()
                     .height(60.dp)
                     .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = "%02d:00".format(hour),

@@ -18,7 +18,7 @@ import com.tungnk123.zark.ui.workplace.WorkplaceScreen
 fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    startDestination: String = NavigationRoute.Login.route
+    startDestination: String = NavigationRoute.Home.route
 ) {
     NavHost(
         navController = navController,
