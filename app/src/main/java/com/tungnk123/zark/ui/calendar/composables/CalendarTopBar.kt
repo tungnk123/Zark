@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.EditCalendar
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Search
@@ -25,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,17 +37,28 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.tungnk123.zark.R
 import com.tungnk123.zark.ui.theme.ZarkTheme
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarTopBar(
-    currentDay: String,
+    currentDateTime: LocalDateTime,
     onChangeDayClick: () -> Unit,
     onSearchClick: () -> Unit,
     onChangeCalendarTypeClick: () -> Unit,
     modifier: Modifier = Modifier,
     @DrawableRes chatIcon: Int = R.drawable.ic_logo,
 ) {
+    val formattedDate = remember(currentDateTime) {
+        val formatter = DateTimeFormatter.ofPattern(
+            "EEE, MMM dd, yyyy",
+            Locale.ENGLISH
+        )
+        currentDateTime.format(formatter)
+    }
+
     TopAppBar(
         windowInsets = WindowInsets(0),
         title = {
@@ -71,12 +82,10 @@ fun CalendarTopBar(
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable(
-                        onClick = onChangeDayClick
-                    )
+                    modifier = Modifier.clickable(onClick = onChangeDayClick)
                 ) {
                     Text(
-                        text = currentDay,
+                        text = formattedDate,
                         style = MaterialTheme.typography.displayLarge.copy(
                             color = Color.Black,
                             fontSize = 20.sp
@@ -91,7 +100,6 @@ fun CalendarTopBar(
                     )
                 }
             }
-
         },
         actions = {
             IconButton(onClick = onChangeCalendarTypeClick) {
@@ -119,7 +127,13 @@ fun CalendarTopBar(
 fun CalendarTopBarPreview() {
     ZarkTheme {
         CalendarTopBar(
-            currentDay = "thg 5, 2025",
+            currentDateTime = LocalDateTime.of(
+                2025,
+                5,
+                19,
+                0,
+                0
+            ),
             onChangeDayClick = {},
             onSearchClick = {},
             onChangeCalendarTypeClick = {}
