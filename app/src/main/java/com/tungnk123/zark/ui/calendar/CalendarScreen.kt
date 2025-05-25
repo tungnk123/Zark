@@ -2,7 +2,9 @@ package com.tungnk123.zark.ui.calendar
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,64 +25,64 @@ import com.tungnk123.zark.ui.calendar.composables.ThreeDayView
 import com.tungnk123.zark.ui.calendar.composables.TimeAgendaView
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
+import java.time.ZoneId
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
-//    calendarViewModel: CalendarViewModel = hiltViewModel()
 ) {
     var selectedType by remember { mutableStateOf(CalendarType.SCHEDULE) }
     val topSheetState = rememberTopSheetState()
     val scope = rememberCoroutineScope()
 
-//    val events by calendarViewModel.events.collectAsState()
+    var selectedDateTime by remember { mutableStateOf(LocalDateTime.now()) }
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = selectedDateTime
+            .atZone(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+    )
 
     val events = listOf(
         CalendarDto(
-            id = "1",
-            title = "Team Meeting",
-            startTime = LocalDateTime.now()
-                .withHour(14)
+            "1",
+            "Team Meeting",
+            selectedDateTime.withHour(14)
                 .withMinute(30),
-            endTime = LocalDateTime.now()
-                .withHour(15)
-                .withMinute(30),
+            selectedDateTime.withHour(15)
+                .withMinute(30)
         ),
         CalendarDto(
-            id = "2",
-            title = "Code Review",
-            startTime = LocalDateTime.now()
-                .withHour(9)
-                .withMinute(0),
-            endTime = LocalDateTime.now()
-                .withHour(10)
-                .withMinute(0),
+            "2",
+            "Code Review",
+            selectedDateTime.withHour(9),
+            selectedDateTime.withHour(10)
         ),
         CalendarDto(
-            id = "3",
-            title = "Code Review 3",
-            startTime = LocalDateTime.now()
-                .withHour(22)
-                .withMinute(0),
-            endTime = LocalDateTime.now()
-                .withHour(22)
-                .withMinute(30),
+            "3",
+            "Code Review 3",
+            selectedDateTime.withHour(22),
+            selectedDateTime.withHour(22)
+                .withMinute(30)
         )
     )
+
     Scaffold(
         modifier = modifier,
         topBar = {
             CalendarTopBar(
-                currentDateTime = LocalDateTime.now(),
-                onChangeDayClick = {},
-                onSearchClick = {
+                currentDateTime = selectedDateTime,
+                onChangeDayClick = {
+                    showDatePicker = true
                 },
-                onChangeCalendarTypeClick = {
-                    scope.launch {
-                        topSheetState.expand()
-                    }
-                }
+                onSearchClick = {
+
+                },
+                onChangeCalendarTypeClick = { scope.launch { topSheetState.expand() } },
             )
         },
         containerColor = Color.White
@@ -88,25 +90,56 @@ fun CalendarScreen(
         Column {
             when (selectedType) {
                 CalendarType.SCHEDULE -> TimeAgendaView(
-                    events = events,
-                    modifier = Modifier.padding(padding)
+                    events,
+                    Modifier.padding(padding)
                 )
 
                 CalendarType.DAY -> SingleDayView(
-                    events = events,
-                    modifier = Modifier.padding(padding)
+                    events,
+                    Modifier.padding(padding)
                 )
+
                 CalendarType.THREE_DAY -> ThreeDayView(
-                    events = events,
-                    modifier = Modifier.padding(padding)
+                    events,
+                    Modifier.padding(padding)
                 )
 
                 CalendarType.WEEK -> ThreeDayView(
-                    events = events,
-                    modifier = Modifier.padding(padding)
+                    events,
+                    Modifier.padding(padding)
                 )
-                CalendarType.MONTH -> MonthCalendarView(modifier = Modifier.padding(padding))
+
+                CalendarType.MONTH -> MonthCalendarView(Modifier.padding(padding))
             }
+        }
+    }
+
+    if (showDatePicker) {
+        androidx.compose.material3.DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    showDatePicker = false
+                    val millis = datePickerState.selectedDateMillis
+                    millis?.let {
+                        val date = java.time.Instant.ofEpochMilli(it)
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate()
+                        selectedDateTime = date.atStartOfDay()
+                    }
+                }) {
+                    androidx.compose.material3.Text("OK")
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    showDatePicker = false
+                }) {
+                    androidx.compose.material3.Text("Cancel")
+                }
+            }
+        ) {
+            androidx.compose.material3.DatePicker(state = datePickerState)
         }
     }
 
@@ -114,10 +147,6 @@ fun CalendarScreen(
         topSheetState = topSheetState,
         selectedType = selectedType,
         onTypeSelected = { selectedType = it },
-        onDismissRequest = {
-            scope.launch {
-                topSheetState.collapse()
-            }
-        },
+        onDismissRequest = { scope.launch { topSheetState.collapse() } }
     )
 }
