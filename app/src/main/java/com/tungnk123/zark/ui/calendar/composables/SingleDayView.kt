@@ -47,14 +47,6 @@ fun SingleDayView(
     }
 
     LazyColumn(modifier = modifier.fillMaxSize()) {
-        item {
-            Text(
-                stringResource(
-                    R.string.msg_today,
-                    LocalDate.now()
-                )
-            )
-        }
         items(24) { hour ->
             val eventsInHour = events.filter { it.startTime.hour == hour }
 

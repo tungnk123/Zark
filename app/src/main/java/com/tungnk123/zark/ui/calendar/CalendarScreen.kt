@@ -96,8 +96,15 @@ fun CalendarScreen(
                     events = events,
                     modifier = Modifier.padding(padding)
                 )
-                CalendarType.THREE_DAY -> ThreeDayView(modifier = Modifier.padding(padding))
-                CalendarType.WEEK -> ThreeDayView(modifier = Modifier.padding(padding)) // Replace if needed
+                CalendarType.THREE_DAY -> ThreeDayView(
+                    events = events,
+                    modifier = Modifier.padding(padding)
+                )
+
+                CalendarType.WEEK -> ThreeDayView(
+                    events = events,
+                    modifier = Modifier.padding(padding)
+                )
                 CalendarType.MONTH -> MonthCalendarView(modifier = Modifier.padding(padding))
             }
         }
