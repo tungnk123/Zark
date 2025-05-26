@@ -2,12 +2,15 @@ package com.tungnk123.zark.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.navArgument
 import com.tungnk123.zark.ui.calendar.CalendarScreen
+import com.tungnk123.zark.ui.calendar.CalendarViewModel
 import com.tungnk123.zark.ui.chat.ChatScreen
+import com.tungnk123.zark.ui.event.AddEventScreen
 import com.tungnk123.zark.ui.home.HomeScreen
 import com.tungnk123.zark.ui.login.LoginScreen
 import com.tungnk123.zark.ui.search.SearchScreen
@@ -20,6 +23,7 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
     startDestination: String = NavigationRoute.Home.route
 ) {
+    val calendarViewModel: CalendarViewModel = hiltViewModel()
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -58,7 +62,14 @@ fun AppNavHost(
 
         baseComposable(NavigationBarMetadataItem.Calendar) {
             CalendarScreen(
-                navController = navController
+                navController = navController,
+                calendarViewModel = calendarViewModel
+            )
+        }
+        baseComposable(NavigationBarMetadataItem.AddEvent) {
+            AddEventScreen(
+                navController = navController,
+                calendarViewModel = calendarViewModel
             )
         }
         baseComposable(NavigationBarMetadataItem.Workplace) {
