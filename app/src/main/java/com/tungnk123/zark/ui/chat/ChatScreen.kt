@@ -38,8 +38,6 @@ import com.tungnk123.zark.ui.chat.composables.ChatInputBar
 import com.tungnk123.zark.ui.chat.composables.ChatTopBar
 import com.tungnk123.zark.ui.chat.composables.TypingIndicator
 import com.tungnk123.zark.ui.common.DateHeader
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 @OptIn(

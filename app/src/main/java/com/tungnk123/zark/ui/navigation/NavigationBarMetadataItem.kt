@@ -37,6 +37,10 @@ enum class NavigationBarMetadataItem(
         unselectedIconRes = R.drawable.ic_calendar,
         navigationRoute = NavigationRoute.Calendar
     ),
+    AddEvent(
+        labelResId = NavigationRoute.AddEvent.name,
+        navigationRoute = NavigationRoute.AddEvent
+    ),
     Workplace(
         labelResId = NavigationRoute.Workplace.name,
         selectedIconRes = R.drawable.ic_workplace_selected,
