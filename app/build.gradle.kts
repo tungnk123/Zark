@@ -140,6 +140,10 @@ dependencies {
     implementation(libs.okhttp3.logging.interceptor)
     implementation(libs.logginginterceptor)
 
+    // chucker
+    debugImplementation(libs.chucker)
+    releaseImplementation(libs.chucker.no.op)
+
     // SignalR
     implementation(libs.signalr)
     implementation(libs.signalrkore)

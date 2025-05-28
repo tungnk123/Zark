@@ -1,6 +1,7 @@
 package com.tungnk123.zark.di
 
 import android.content.Context
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.ihsanbal.logging.Level
 import com.ihsanbal.logging.LoggingInterceptor
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -75,14 +76,20 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideHttpClient(
+        @ApplicationContext context: Context,
         @AuthInterceptorAnnotation authInterceptor: AuthInterceptor,
         loggingInterceptor: LoggingInterceptor,
         @ForceCacheInterceptorAnnotation forceCacheInterceptor: Interceptor,
-        cache: Cache
+        cache: Cache,
     ): OkHttpClient = OkHttpClient.Builder()
         .cache(cache)
         .addInterceptor(authInterceptor)
         .addInterceptor(loggingInterceptor)
+        .addInterceptor(
+            ChuckerInterceptor.Builder(context)
+                .maxContentLength(10240)
+                .build()
+        )
         .connectTimeout(TIMEOUT_MINUTES, TimeUnit.MINUTES)
         .readTimeout(TIMEOUT_MINUTES, TimeUnit.MINUTES)
         .build()
