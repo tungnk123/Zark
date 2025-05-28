@@ -111,6 +111,7 @@ fun ChatScreen(
                 placeholder = "Chat with $conversationId",
                 onSendClick = {
                     if (isConnected && message.isNotBlank()) {
+                        chatViewModel.processText(message)
                         chatViewModel.sendMessage(
                             conversationId = conversationId,
                             content = message

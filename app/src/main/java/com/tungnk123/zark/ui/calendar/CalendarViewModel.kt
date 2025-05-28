@@ -53,37 +53,4 @@ class CalendarViewModel @Inject constructor(
             _events.value = sampleEvents
         }
     }
-
-    fun processText(text: String) {
-        "Process text: $text".printLog("test_detect")
-        viewModelScope.launch {
-            try {
-                val currentTime = OffsetDateTime.now().withOffsetSameInstant(java.time.ZoneOffset.ofHours(7))
-                val formattedNow = currentTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-
-                val request = ScheduleRequest(
-                    text = text,
-                    currentDatetime = formattedNow
-                )
-
-                val response = scheduleRepository.processText(request)
-
-                "Response: $response".printLog("test_detect")
-
-                val startTime = OffsetDateTime.parse(response.time).toLocalDateTime()
-                val endTime = startTime.plusHours(1)
-
-//                val newEvent = CalendarDto(
-//                    id = UUID.randomUUID().toString(),
-//                    title = response.event,
-//                    startTime = startTime,
-//                    endTime = endTime
-//                )
-//
-//                addEvent(newEvent)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
 }

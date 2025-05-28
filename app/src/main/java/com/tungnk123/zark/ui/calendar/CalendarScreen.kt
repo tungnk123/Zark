@@ -60,10 +60,6 @@ fun CalendarScreen(
             .toEpochMilli()
     )
 
-    LaunchedEffect(Unit) {
-        calendarViewModel.processText("Ngày mai đi chơi với em Hoài")
-    }
-
     Scaffold(
         modifier = modifier,
         topBar = {

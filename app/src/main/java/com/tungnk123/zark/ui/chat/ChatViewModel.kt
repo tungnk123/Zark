@@ -2,22 +2,28 @@ package com.tungnk123.zark.ui.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tungnk123.zark.data.dto.detectevent.ScheduleRequest
 import com.tungnk123.zark.repository.message.MessageRepository
+import com.tungnk123.zark.repository.schedule.ScheduleRepository
 import com.tungnk123.zark.ui.chat.state.ChatUiState
 import com.tungnk123.zark.utils.TokenManager
 import com.tungnk123.zark.utils.extensions.printException
+import com.tungnk123.zark.utils.extensions.printLog
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val messageRepository: MessageRepository,
-    private val tokenManager: TokenManager
+    private val scheduleRepository: ScheduleRepository,
+    private val tokenManager: TokenManager,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ChatUiState())
@@ -125,6 +131,42 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             messageRepository.disconnectSignalR()
             updateState { copy(isConnected = false) }
+        }
+    }
+
+    fun processText(text: String) {
+        "Process text: $text".printLog("test_detect")
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val currentTime = OffsetDateTime.now()
+                    .withOffsetSameInstant(java.time.ZoneOffset.ofHours(7))
+                val formattedNow = currentTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+
+                val request = ScheduleRequest(
+                    text = text,
+                    currentDatetime = formattedNow
+                )
+
+                val response = scheduleRepository.processText(request)
+
+                "Response: $response".printLog("test_detect")
+
+                val startTime = OffsetDateTime.parse(response.time)
+                    .toLocalDateTime()
+                val endTime = startTime.plusHours(1)
+
+//                val newEvent = CalendarDto(
+//                    id = UUID.randomUUID().toString(),
+//                    title = response.event,
+//                    startTime = startTime,
+//                    endTime = endTime
+//                )
+//
+//                addEvent(newEvent)
+            }
+            catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 

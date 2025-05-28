@@ -21,7 +21,7 @@ import com.tungnk123.zark.ui.workplace.WorkplaceScreen
 fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    startDestination: String = NavigationRoute.Home.route
+    startDestination: String = NavigationRoute.Login.route
 ) {
     val calendarViewModel: CalendarViewModel = hiltViewModel()
     NavHost(
