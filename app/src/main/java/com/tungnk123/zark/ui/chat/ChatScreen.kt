@@ -38,6 +38,7 @@ import com.tungnk123.zark.ui.chat.composables.ChatInputBar
 import com.tungnk123.zark.ui.chat.composables.ChatTopBar
 import com.tungnk123.zark.ui.chat.composables.TypingIndicator
 import com.tungnk123.zark.ui.common.DateHeader
+import com.tungnk123.zark.utils.extensions.printLog
 import java.time.LocalDateTime
 
 @OptIn(
@@ -59,6 +60,7 @@ fun ChatScreen(
     val incomingMessages = uiState.incomingMessages
     val isConnected = uiState.isConnected
     val currentUserId = uiState.currentUserId
+    val messageWithIntent = uiState.messageWithIntent
 
     val allMessages = remember(
         chatList,
@@ -157,9 +159,15 @@ fun ChatScreen(
                             lastMessageDateTime = currentMessageDate
                             DateHeader(chat.sendDate)
                         }
+                        val isMe = chat.userSendId == currentUserId
+                        val showScheduleButton = chat == messageWithIntent
                         MessageItem(
                             chat = chat,
-                            isMe = chat.userSendId == currentUserId
+                            isMe = isMe,
+                            hasIntentSchedule = showScheduleButton,
+                            onScheduleClick = {
+                                "Schedule button clicked for: ${chat.message}".printLog("test_detect")
+                            },
                         )
                     }
                     if (isTyping) {

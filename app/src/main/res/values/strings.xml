@@ -45,5 +45,6 @@
     <string name="msg_cancel">Hủy</string>
     <string name="msg_no_search_item">Please search some keyword to find conversations</string>
     <string name="msg_today">Today: %1$s</string>
+    <string name="msg_schedule">Schedule</string>
 
 </resources>

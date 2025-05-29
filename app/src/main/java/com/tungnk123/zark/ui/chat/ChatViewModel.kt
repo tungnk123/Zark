@@ -149,6 +149,13 @@ class ChatViewModel @Inject constructor(
 
                 val response = scheduleRepository.processText(request)
 
+                val matchedMessage = _uiState.value.incomingMessages
+                    .lastOrNull { it.message == text }
+
+                updateState {
+                    copy(messageWithIntent = if (response.intent) matchedMessage else null)
+                }
+
                 "Response: $response".printLog("test_detect")
 
                 val startTime = OffsetDateTime.parse(response.time)
