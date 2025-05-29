@@ -4,6 +4,8 @@ import com.tungnk123.zark.repository.conversation.ConversationRepository
 import com.tungnk123.zark.repository.conversation.ConversationRepositoryImpl
 import com.tungnk123.zark.repository.message.MessageRepository
 import com.tungnk123.zark.repository.message.MessageRepositoryImpl
+import com.tungnk123.zark.repository.schedule.ScheduleRepository
+import com.tungnk123.zark.repository.schedule.ScheduleRepositoryImpl
 import com.tungnk123.zark.repository.user.UserRepository
 import com.tungnk123.zark.repository.user.UserRepositoryImpl
 import dagger.Binds
@@ -27,5 +29,9 @@ interface RepositoryModule {
     @Binds
     @Singleton
     fun bindConversationRepository(conversationRepositoryImpl: ConversationRepositoryImpl): ConversationRepository
+
+    @Binds
+    @Singleton
+    fun bindScheduleRepository(scheduleRepositoryImpl: ScheduleRepositoryImpl): ScheduleRepository
 
 }

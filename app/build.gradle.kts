@@ -34,12 +34,14 @@ android {
         }
     }
     val chatHost = "https://zarkchat-fvfgfuhactbbc2bv.southeastasia-01.azurewebsites.net/"
+    val scheduleHost = "https://zarkchat-fastapi.azurewebsites.net/"
     flavorDimensions.add("default")
     productFlavors {
         val properties = Properties()
         properties.load(project.rootProject.file("local.properties").inputStream())
         create("dev") {
             buildConfigField("String", "CHAT_BASE_URL", "\"$chatHost\"")
+            buildConfigField("String", "SCHEDULE_BASE_URL", "\"$scheduleHost\"")
             buildConfigField(
                 "String",
                 "ACCESS_TOKEN",
@@ -137,6 +139,10 @@ dependencies {
     implementation(libs.logging.interceptor)
     implementation(libs.okhttp3.logging.interceptor)
     implementation(libs.logginginterceptor)
+
+    // chucker
+    debugImplementation(libs.chucker)
+    releaseImplementation(libs.chucker.no.op)
 
     // SignalR
     implementation(libs.signalr)

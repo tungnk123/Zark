@@ -1,12 +1,14 @@
 package com.tungnk123.zark.di
 
 import android.content.Context
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.ihsanbal.logging.Level
 import com.ihsanbal.logging.LoggingInterceptor
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.tungnk123.zark.BuildConfig
 import com.tungnk123.zark.network.ConversationService
 import com.tungnk123.zark.network.MessageService
+import com.tungnk123.zark.network.ScheduleService
 import com.tungnk123.zark.network.UserService
 import com.tungnk123.zark.network.interceptor.AuthInterceptor
 import com.tungnk123.zark.utils.TokenManager
@@ -74,21 +76,28 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideHttpClient(
+        @ApplicationContext context: Context,
         @AuthInterceptorAnnotation authInterceptor: AuthInterceptor,
         loggingInterceptor: LoggingInterceptor,
         @ForceCacheInterceptorAnnotation forceCacheInterceptor: Interceptor,
-        cache: Cache
+        cache: Cache,
     ): OkHttpClient = OkHttpClient.Builder()
         .cache(cache)
         .addInterceptor(authInterceptor)
         .addInterceptor(loggingInterceptor)
+        .addInterceptor(
+            ChuckerInterceptor.Builder(context)
+                .maxContentLength(10240)
+                .build()
+        )
         .connectTimeout(TIMEOUT_MINUTES, TimeUnit.MINUTES)
         .readTimeout(TIMEOUT_MINUTES, TimeUnit.MINUTES)
         .build()
 
     @Provides
     @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    @ChatRetrofit
+    fun provideChatRetrofit(okHttpClient: OkHttpClient): Retrofit {
         val contentType = "application/json".toMediaType()
         return Retrofit.Builder()
             .baseUrl(BuildConfig.CHAT_BASE_URL)
@@ -100,18 +109,36 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideUserService(retrofit: Retrofit): UserService =
+    @ScheduleRetrofit
+    fun provideScheduleRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val contentType = "application/json".toMediaType()
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.SCHEDULE_BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(ScalarsConverterFactory.create())
+            .addConverterFactory(json.asConverterFactory(contentType))
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserService(@ChatRetrofit retrofit: Retrofit): UserService =
         retrofit.create(UserService::class.java)
 
     @Provides
     @Singleton
-    fun provideMessageService(retrofit: Retrofit): MessageService =
+    fun provideMessageService(@ChatRetrofit retrofit: Retrofit): MessageService =
         retrofit.create(MessageService::class.java)
 
     @Provides
     @Singleton
-    fun provideConversationService(retrofit: Retrofit): ConversationService =
+    fun provideConversationService(@ChatRetrofit retrofit: Retrofit): ConversationService =
         retrofit.create(ConversationService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideScheduleService(@ScheduleRetrofit retrofit: Retrofit): ScheduleService =
+        retrofit.create(ScheduleService::class.java)
 }
 
 @Qualifier
@@ -121,3 +148,11 @@ annotation class AuthInterceptorAnnotation
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class ForceCacheInterceptorAnnotation
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ChatRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ScheduleRetrofit

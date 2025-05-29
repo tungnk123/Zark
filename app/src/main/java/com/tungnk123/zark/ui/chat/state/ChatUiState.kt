@@ -8,5 +8,6 @@ data class ChatUiState(
     val incomingMessages: List<ChatMessageResponse> = emptyList(),
     val isConnected: Boolean = false,
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val messageWithIntent: ChatMessageResponse? = null
 )

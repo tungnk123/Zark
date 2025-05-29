@@ -1,4 +1,5 @@
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,16 +15,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.tungnk123.zark.R
 import com.tungnk123.zark.data.dto.message.ChatMessageResponse
 import com.tungnk123.zark.ui.theme.c_848484
 import com.tungnk123.zark.ui.theme.c_D3E2FF
@@ -34,7 +39,9 @@ import java.time.LocalDateTime
 fun MessageItem(
     chat: ChatMessageResponse,
     isMe: Boolean,
-    modifier: Modifier = Modifier
+    hasIntentSchedule: Boolean,
+    onScheduleClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
@@ -83,6 +90,38 @@ fun MessageItem(
 
         Spacer(Modifier.height(8.dp))
 
+        if (hasIntentSchedule) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = if (isMe) 0.dp else 8.dp, end = if (isMe) 8.dp else 0.dp),
+                horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start,
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.LightGray.copy(alpha = 0.2f))
+                        .clickable { onScheduleClick() }
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Schedule,
+                        contentDescription = stringResource(R.string.msg_schedule),
+                        tint = c_848484,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.msg_schedule),
+                        fontSize = 14.sp,
+                        color = c_848484
+                    )
+                }
+            }
+        }
+
         if (chat.isPinned) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -125,7 +164,9 @@ fun PreviewMessageItemMe() {
             isPinned = true,
             mediaLink = null
         ),
-        isMe = true
+        isMe = true,
+        hasIntentSchedule = false,
+        onScheduleClick = {}
     )
 }
 
@@ -148,6 +189,8 @@ fun PreviewMessageItemOther() {
             isPinned = false,
             mediaLink = null
         ),
-        isMe = false
+        isMe = false,
+        hasIntentSchedule = true,
+        onScheduleClick = {}
     )
 }
