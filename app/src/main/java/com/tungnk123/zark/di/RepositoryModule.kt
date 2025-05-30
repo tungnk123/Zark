@@ -2,6 +2,8 @@ package com.tungnk123.zark.di
 
 import com.tungnk123.zark.repository.conversation.ConversationRepository
 import com.tungnk123.zark.repository.conversation.ConversationRepositoryImpl
+import com.tungnk123.zark.repository.event.EventRepository
+import com.tungnk123.zark.repository.event.EventRepositoryImpl
 import com.tungnk123.zark.repository.message.MessageRepository
 import com.tungnk123.zark.repository.message.MessageRepositoryImpl
 import com.tungnk123.zark.repository.schedule.ScheduleRepository
@@ -33,5 +35,9 @@ interface RepositoryModule {
     @Binds
     @Singleton
     fun bindScheduleRepository(scheduleRepositoryImpl: ScheduleRepositoryImpl): ScheduleRepository
+
+    @Binds
+    @Singleton
+    fun bindEventRepository(eventRepositoryImpl: EventRepositoryImpl): EventRepository
 
 }

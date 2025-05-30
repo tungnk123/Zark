@@ -5,12 +5,13 @@ import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
 @Serializable
-data class CalendarDto(
-    val id: String = "",
+data class CreateEventRequest(
+    val creatorId: Int,
     val title: String,
+    val description: String,
     @Serializable(with = LocalDateTimeSerializer::class)
     val startTime: LocalDateTime,
     @Serializable(with = LocalDateTimeSerializer::class)
     val endTime: LocalDateTime,
-    val description: String? = null,
+    val participants: List<Int> = emptyList(),
 )

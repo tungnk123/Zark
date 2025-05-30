@@ -43,9 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.tungnk123.zark.data.dto.calendar.CalendarDto
-import com.tungnk123.zark.ui.calendar.CalendarViewModel
-import com.tungnk123.zark.utils.extensions.printLog
+import com.tungnk123.zark.data.dto.calendar.CreateEventRequest
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -61,13 +59,13 @@ import kotlin.math.min
 fun AddEventScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
-    calendarViewModel: CalendarViewModel = hiltViewModel(),
+    eventViewModel: EventViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
 
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var attendees by remember { mutableStateOf("") }  // Thêm biến lưu khách mời (chuỗi comma-separated)
+    var attendees by remember { mutableStateOf("") }
     var startDateTime by remember { mutableStateOf(LocalDateTime.now()) }
     var endDateTime by remember {
         mutableStateOf(
@@ -123,16 +121,15 @@ fun AddEventScreen(
         bottomBar = {
             Button(
                 onClick = {
-                    val event = CalendarDto(
-                        id = System.currentTimeMillis()
-                            .toString(),
+                    val createEventRequest = CreateEventRequest(
+                        creatorId = 23,
                         title = title,
                         description = description,
                         startTime = startDateTime,
                         endTime = endDateTime,
+                        participants = listOf()
                     )
-                    "Current event: $event".printLog("test")
-                    calendarViewModel.addEvent(event)
+                    eventViewModel.createEvent(createEventRequest)
                     navController.popBackStack()
                 },
                 enabled = title.isNotBlank(),

@@ -37,7 +37,7 @@ fun HomeScreen(
     val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
-        homeViewModel.fetchConversations()
+//        homeViewModel.fetchConversations()
     }
 
     LaunchedEffect(uiState.error) {

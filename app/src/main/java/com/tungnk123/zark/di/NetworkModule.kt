@@ -7,8 +7,9 @@ import com.ihsanbal.logging.LoggingInterceptor
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.tungnk123.zark.BuildConfig
 import com.tungnk123.zark.network.ConversationService
+import com.tungnk123.zark.network.DetectScheduleService
+import com.tungnk123.zark.network.EventService
 import com.tungnk123.zark.network.MessageService
-import com.tungnk123.zark.network.ScheduleService
 import com.tungnk123.zark.network.UserService
 import com.tungnk123.zark.network.interceptor.AuthInterceptor
 import com.tungnk123.zark.utils.TokenManager
@@ -37,7 +38,10 @@ object NetworkModule {
     private const val TIMEOUT_MINUTES = 1L
     private const val CACHE_SIZE = 50L * 1024 * 1024
     private const val MAX_STALE_CACHE_TIME = 60
-    private val json = Json { ignoreUnknownKeys = true }
+    private val json = Json {
+        ignoreUnknownKeys = true
+        encodeDefaults = true
+    }
 
     @Provides
     @Singleton
@@ -137,8 +141,13 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideScheduleService(@ScheduleRetrofit retrofit: Retrofit): ScheduleService =
-        retrofit.create(ScheduleService::class.java)
+    fun provideEventService(@ChatRetrofit retrofit: Retrofit): EventService =
+        retrofit.create(EventService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideDetectScheduleService(@ScheduleRetrofit retrofit: Retrofit): DetectScheduleService =
+        retrofit.create(DetectScheduleService::class.java)
 }
 
 @Qualifier

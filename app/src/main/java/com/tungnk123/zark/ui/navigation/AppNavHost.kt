@@ -69,7 +69,6 @@ fun AppNavHost(
         baseComposable(NavigationBarMetadataItem.AddEvent) {
             AddEventScreen(
                 navController = navController,
-                calendarViewModel = calendarViewModel
             )
         }
         baseComposable(NavigationBarMetadataItem.Workplace) {

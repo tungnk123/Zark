@@ -20,12 +20,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.tungnk123.zark.data.dto.calendar.CalendarDto
+import com.tungnk123.zark.data.dto.calendar.EventDetail
 import java.time.LocalDate
 
 @Composable
 fun ThreeDayView(
-    events: List<CalendarDto>,
+    events: List<EventDetail>,
     modifier: Modifier = Modifier,
 ) {
     val today = LocalDate.now()
