@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.tungnk123.zark.data.dto.calendar.CreateEventRequest
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -121,15 +120,13 @@ fun AddEventScreen(
         bottomBar = {
             Button(
                 onClick = {
-                    val createEventRequest = CreateEventRequest(
-                        creatorId = 23,
+                    eventViewModel.createEvent(
                         title = title,
                         description = description,
                         startTime = startDateTime,
                         endTime = endDateTime,
-                        participants = listOf()
+                        participants = emptyList()
                     )
-                    eventViewModel.createEvent(createEventRequest)
                     navController.popBackStack()
                 },
                 enabled = title.isNotBlank(),
