@@ -70,9 +70,11 @@ class CalendarViewModel @Inject constructor(
     }
 
     fun getEvents() {
+        "Start get events".printLog("test_event")
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val currentUserId = tokenManager.userId.firstOrNull() ?: return@launch
+                "Start get events for user id: $currentUserId".printLog("test_event")
                 val response = eventRepository.getEventsByUserId(currentUserId)
                 "Get events: $response".printLog("test_event")
                 _events.value = response.message

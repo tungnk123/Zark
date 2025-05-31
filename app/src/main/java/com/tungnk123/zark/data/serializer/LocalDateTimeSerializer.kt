@@ -1,5 +1,6 @@
 package com.tungnk123.zark.data.serializer
 
+import com.tungnk123.zark.utils.extensions.printException
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
@@ -23,11 +24,25 @@ object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
     }
 
     override fun deserialize(decoder: Decoder): LocalDateTime {
-        val string = decoder.decodeString()
-        val clean = string.removeSuffix("Z")
-        return LocalDateTime.parse(
-            clean,
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")
+        val string = decoder.decodeString().removeSuffix("Z")
+
+        val patterns = listOf(
+            "yyyy-MM-dd'T'HH:mm:ss.SSS",
+            "yyyy-MM-dd'T'HH:mm:ss.SS",
+            "yyyy-MM-dd'T'HH:mm:ss.S",
+            "yyyy-MM-dd'T'HH:mm:ss"
         )
+
+        for (pattern in patterns) {
+            try {
+                return LocalDateTime.parse(string, DateTimeFormatter.ofPattern(pattern))
+            } catch (e: Exception) {
+                e.printException()
+            }
+        }
+
+        throw IllegalArgumentException("Unsupported date format: $string")
     }
+
+
 }

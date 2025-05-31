@@ -1,5 +1,6 @@
 package com.tungnk123.zark.ui.calendar
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -45,7 +46,7 @@ fun CalendarScreen(
     modifier: Modifier = Modifier,
     calendarViewModel: CalendarViewModel = hiltViewModel(),
 ) {
-    var selectedType by remember { mutableStateOf(CalendarType.DAY) }
+    var selectedCalendarType by remember { mutableStateOf(CalendarType.DAY) }
     val topSheetState = rememberTopSheetState()
     val scope = rememberCoroutineScope()
     val events by calendarViewModel.events.collectAsStateWithLifecycle()
@@ -66,8 +67,16 @@ fun CalendarScreen(
         }
     }
 
-    LaunchedEffect(selectedType) {
+    LaunchedEffect(selectedCalendarType) {
         calendarViewModel.getEvents()
+    }
+
+    LaunchedEffect(selectedDateTime) {
+        Log.d("CalendarScreen", "Events: $events")
+        Log.d("CalendarScreen", "Filtered Events: ${filteredEvents.size}")
+        filteredEvents.forEach {
+            Log.d("CalendarScreen", "Event: ${it.title} at ${it.startTime}")
+        }
     }
 
     Scaffold(
@@ -98,7 +107,7 @@ fun CalendarScreen(
         Column(
             modifier = Modifier.padding(padding)
         ) {
-            when (selectedType) {
+            when (selectedCalendarType) {
                 CalendarType.SCHEDULE -> TimeAgendaView(filteredEvents)
                 CalendarType.DAY -> SingleDayView(filteredEvents)
                 CalendarType.THREE_DAY -> ThreeDayView(events)
@@ -139,8 +148,8 @@ fun CalendarScreen(
 
     ChangeCalendarTypeTopSheet(
         topSheetState = topSheetState,
-        selectedType = selectedType,
-        onTypeSelected = { selectedType = it },
+        selectedType = selectedCalendarType,
+        onTypeSelected = { selectedCalendarType = it },
         onDismissRequest = { scope.launch { topSheetState.collapse() } }
     )
 }

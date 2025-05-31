@@ -1,18 +1,29 @@
 package com.tungnk123.zark.ui.calendar.composables
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import com.tungnk123.zark.data.dto.calendar.EventDetail
 import kotlinx.coroutines.delay
 import java.time.LocalTime
@@ -32,8 +43,6 @@ fun SingleDayView(
         }
     }
 
-    val density = LocalDensity.current
-
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(24) { hour ->
             val eventsInHour = events.filter { it.startTime.hour == hour }
@@ -44,7 +53,6 @@ fun SingleDayView(
                     .height(hourHeight)
                     .padding(horizontal = 16.dp)
             ) {
-                // Thời gian bên trái
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -55,29 +63,16 @@ fun SingleDayView(
                         text = "%02d:00".format(hour),
                         modifier = Modifier.width(60.dp)
                     )
+                    HorizontalDivider(
+                        modifier = Modifier.weight(1f),
+                        thickness = 1.dp,
+                        color = Color.Black
+                    )
                 }
 
-                // Các task trong giờ hiện tại
-                eventsInHour.forEach { event ->
-                    val minuteOffset = event.startTime.minute
-                    val offsetY = with(density) {
-                        (minuteOffset / 60f) * hourHeight.toPx()
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .padding(start = 60.dp)
-                            .offset(y = Dp(offsetY / density.density))
-                            .zIndex(1f) // đảm bảo vẽ trên divider
-                    ) {
-                        TaskItem(title = event.title)
-                    }
-                }
-
-                // Vẽ dòng thời gian hiện tại nếu khớp giờ
                 if (hour == currentTime.hour) {
                     val minuteOffset = currentTime.minute
-                    val offsetY = with(density) {
+                    val offsetY = with(LocalDensity.current) {
                         (minuteOffset / 60f) * hourHeight.toPx()
                     }
 
@@ -86,23 +81,28 @@ fun SingleDayView(
                             .fillMaxWidth()
                             .height(2.dp)
                             .offset(
-                                y = Dp(offsetY / density.density),
+                                y = Dp(offsetY / LocalDensity.current.density),
                                 x = 60.dp
                             )
                             .background(Color.Red)
-                            .zIndex(2f) // trên tất cả
                     )
                 }
+                eventsInHour.forEach { event ->
+                    val minuteOffset = event.startTime.minute
+                    val offsetY = with(LocalDensity.current) {
+                        (minuteOffset / 60f) * hourHeight.toPx()
+                    }
 
-                // Divider vẽ sau cùng, dưới cùng
-                HorizontalDivider(
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(start = 60.dp)
-                        .zIndex(0f),
-                    thickness = 1.dp,
-                    color = Color.Black
-                )
+                    Box(
+                        modifier = Modifier
+                            .padding(
+                                start = 60.dp
+                            )
+                            .offset(y = Dp(offsetY / LocalDensity.current.density))
+                    ) {
+                        TaskItem(title = event.title)
+                    }
+                }
             }
         }
     }
