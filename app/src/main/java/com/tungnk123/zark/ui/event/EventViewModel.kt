@@ -32,24 +32,23 @@ class EventViewModel @Inject constructor(
         participants: List<Int>,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            val currentUserId = tokenManager.userId.firstOrNull() ?: return@launch
-            val createEventRequest = CreateEventRequest(
-                creatorId = currentUserId,
-                title = title,
-                description = description,
-                startTime = startTime,
-                endTime = endTime,
-                participants = participants
-            )
-            "Event request: $createEventRequest".printLog("test_event")
             try {
+                val currentUserId = tokenManager.userId.firstOrNull() ?: return@launch
+                val createEventRequest = CreateEventRequest(
+                    creatorId = currentUserId,
+                    title = title,
+                    description = description,
+                    startTime = startTime,
+                    endTime = endTime,
+                    participants = participants
+                )
+                "Event request: $createEventRequest".printLog("test_event")
                 val response = eventRepository.createEvent(createEventRequest)
                 "Response: $response".printLog("test_event")
             }
             catch (e: Exception) {
                 e.printException(TAG)
             }
-
         }
     }
 }

@@ -8,4 +8,5 @@ class EventRepositoryImpl @Inject constructor(
     private val eventService: EventService,
 ) : EventRepository {
     override suspend fun createEvent(event: CreateEventRequest) = eventService.createEvent(event)
+    override suspend fun getEventsByUserId(userId: Int) = eventService.getEventsByUserId(userId)
 }

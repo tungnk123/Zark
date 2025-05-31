@@ -60,6 +60,16 @@ fun CalendarScreen(
             .toEpochMilli()
     )
 
+    val filteredEvents = remember(events, selectedDateTime) {
+        events.filter { event ->
+            event.startTime.toLocalDate() == selectedDateTime.toLocalDate()
+        }
+    }
+
+    LaunchedEffect(selectedType) {
+        calendarViewModel.getEvents()
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -89,8 +99,8 @@ fun CalendarScreen(
             modifier = Modifier.padding(padding)
         ) {
             when (selectedType) {
-                CalendarType.SCHEDULE -> TimeAgendaView(events)
-                CalendarType.DAY -> SingleDayView(events)
+                CalendarType.SCHEDULE -> TimeAgendaView(filteredEvents)
+                CalendarType.DAY -> SingleDayView(filteredEvents)
                 CalendarType.THREE_DAY -> ThreeDayView(events)
                 CalendarType.WEEK -> ThreeDayView(events)
                 CalendarType.MONTH -> MonthCalendarView()
