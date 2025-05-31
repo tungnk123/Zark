@@ -22,5 +22,13 @@ data class EventDetail(
     val startTime: LocalDateTime,
     @Serializable(with = LocalDateTimeSerializer::class)
     val endTime: LocalDateTime,
-    val participants: List<Int>,
+    val participants: List<Participant>,
+)
+
+@Serializable
+data class Participant(
+    val id: Int,
+    val displayName: String,
+    val status: String,
+    val avatar: String? = ""
 )

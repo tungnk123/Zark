@@ -10,39 +10,27 @@ import kotlinx.serialization.encoding.Encoder
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
-    private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor("LocalDateTime", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: LocalDateTime) {
-        val utc = value.atOffset(ZoneOffset.UTC)
-            .format(formatter)
-        encoder.encodeString(utc)
+        val instant = value.toInstant(ZoneOffset.UTC)
+        val formatted = DateTimeFormatter.ISO_INSTANT.format(instant)
+        encoder.encodeString(formatted)
     }
 
     override fun deserialize(decoder: Decoder): LocalDateTime {
-        val string = decoder.decodeString().removeSuffix("Z")
+        val rawString = decoder.decodeString()
 
-        val patterns = listOf(
-            "yyyy-MM-dd'T'HH:mm:ss.SSS",
-            "yyyy-MM-dd'T'HH:mm:ss.SS",
-            "yyyy-MM-dd'T'HH:mm:ss.S",
-            "yyyy-MM-dd'T'HH:mm:ss"
-        )
-
-        for (pattern in patterns) {
-            try {
-                return LocalDateTime.parse(string, DateTimeFormatter.ofPattern(pattern))
-            } catch (e: Exception) {
-                e.printException()
-            }
+        try {
+            val instant = java.time.Instant.parse(rawString)
+            return LocalDateTime.ofInstant(instant, ZoneOffset.UTC)
+        } catch (e: DateTimeParseException) {
+            e.printException()
+            throw IllegalArgumentException("Unsupported date format: $rawString")
         }
-
-        throw IllegalArgumentException("Unsupported date format: $string")
     }
-
-
 }
