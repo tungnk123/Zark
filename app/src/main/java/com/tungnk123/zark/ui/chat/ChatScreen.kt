@@ -38,6 +38,8 @@ import com.tungnk123.zark.ui.chat.composables.ChatInputBar
 import com.tungnk123.zark.ui.chat.composables.ChatTopBar
 import com.tungnk123.zark.ui.chat.composables.TypingIndicator
 import com.tungnk123.zark.ui.common.DateHeader
+import com.tungnk123.zark.ui.navigation.NavigationBarMetadataItem
+import com.tungnk123.zark.utils.extensions.navigateToDestinationWithParameter
 import com.tungnk123.zark.utils.extensions.printLog
 import java.time.LocalDateTime
 
@@ -61,6 +63,7 @@ fun ChatScreen(
     val isConnected = uiState.isConnected
     val currentUserId = uiState.currentUserId
     val messageWithIntent = uiState.messageWithIntent
+    val eventRequestJson = uiState.eventRequestJson
 
     val allMessages = remember(
         chatList,
@@ -166,7 +169,11 @@ fun ChatScreen(
                             isMe = isMe,
                             hasIntentSchedule = showScheduleButton,
                             onScheduleClick = {
-                                "Schedule button clicked for: ${chat.message}".printLog("test_detect")
+                                "Navigate to destination with: $eventRequestJson".printLog("test_nav")
+                                navController.navigateToDestinationWithParameter(
+                                    NavigationBarMetadataItem.AddEvent,
+                                    eventRequestJson
+                                )
                             },
                         )
                     }

@@ -16,12 +16,13 @@ import com.tungnk123.zark.ui.login.LoginScreen
 import com.tungnk123.zark.ui.search.SearchScreen
 import com.tungnk123.zark.ui.signin.SignInScreen
 import com.tungnk123.zark.ui.workplace.WorkplaceScreen
+import com.tungnk123.zark.utils.extensions.printLog
 
 @Composable
 fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    startDestination: String = NavigationRoute.Login.route
+    startDestination: String = NavigationRoute.Login.route,
 ) {
     val calendarViewModel: CalendarViewModel = hiltViewModel()
     NavHost(
@@ -45,7 +46,8 @@ fun AppNavHost(
             )
         }
         baseComposable(
-            item = NavigationBarMetadataItem.Chat, arguments = listOf(
+            item = NavigationBarMetadataItem.Chat,
+            arguments = listOf(
                 navArgument("conversationId") { type = NavType.IntType })
         ) { backStackEntry ->
             val conversationId =
@@ -66,9 +68,20 @@ fun AppNavHost(
                 calendarViewModel = calendarViewModel
             )
         }
-        baseComposable(NavigationBarMetadataItem.AddEvent) {
+        baseComposable(
+            NavigationBarMetadataItem.AddEvent,
+            arguments = listOf(
+                navArgument("eventRequestJson") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                })
+        ) { backStackEntry ->
+            val eventRequestJson = backStackEntry.arguments?.getString("eventRequestJson")
+            "Event request json in AppNavHost: $eventRequestJson".printLog("test_nav")
             AddEventScreen(
                 navController = navController,
+                eventRequestJson = eventRequestJson
             )
         }
         baseComposable(NavigationBarMetadataItem.Workplace) {

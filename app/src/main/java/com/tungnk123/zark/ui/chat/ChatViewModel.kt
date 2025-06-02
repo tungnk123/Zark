@@ -16,7 +16,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
@@ -166,7 +168,7 @@ class ChatViewModel @Inject constructor(
                     .toLocalDateTime()
                 val endTime = startTime.plusHours(1)
 
-                createEvent(
+                saveEventToUiState(
                     title = response.event,
                     description = response.event,
                     startTime = startTime,
@@ -180,7 +182,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun createEvent(
+    fun saveEventToUiState(
         title: String,
         description: String,
         startTime: LocalDateTime,
@@ -198,9 +200,13 @@ class ChatViewModel @Inject constructor(
                     endTime = endTime,
                     participants = participants
                 )
-                "Event request: $createEventRequest".printLog("test_event")
-                val response = eventRepository.createEvent(createEventRequest)
-                "Response: $response".printLog("test_event")
+                "Event request in ChatViewModel: $createEventRequest".printLog("test_chat")
+                val json = Json { encodeDefaults = true }
+                val eventRequestJson = json.encodeToString(createEventRequest)
+
+                _uiState.update {
+                    it.copy(eventRequestJson = eventRequestJson)
+                }
             }
             catch (e: Exception) {
                 e.printException(TAG)
