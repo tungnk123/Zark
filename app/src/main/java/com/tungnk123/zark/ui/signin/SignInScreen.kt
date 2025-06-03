@@ -1,5 +1,6 @@
 package com.tungnk123.zark.ui.signin
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -46,8 +49,16 @@ fun SignInScreen(
     signInViewModel: SignInViewModel = hiltViewModel()
 ) {
     var email by remember { mutableStateOf("") }
+    var displayName by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        signInViewModel.eventFlow.collect { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -69,13 +80,6 @@ fun SignInScreen(
                     .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(24.dp))
-                Image(
-                    painter = painterResource(R.drawable.ic_logo),
-                    modifier = Modifier.size(92.dp),
-                    contentDescription = null
-                )
-                Spacer(modifier = Modifier.height(32.dp))
                 Text(
                     text = stringResource(R.string.msg_sign_in_account),
                     style = MaterialTheme.typography.titleLarge.copy(
@@ -99,6 +103,16 @@ fun SignInScreen(
                     onValueChange = { email = it },
                     labelResId = R.string.msg_phone,
                     leadIconResId = R.drawable.ic_phone,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                CustomTextField(
+                    value = displayName,
+                    onValueChange = { displayName = it },
+                    labelResId = R.string.msg_display_name,
+                    leadIconResId = R.drawable.ic_user,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -133,7 +147,8 @@ fun SignInScreen(
                     onClick = {
                         signInViewModel.registerUser(
                             email = email,
-                            password = password
+                            password = password,
+                            displayName = displayName
                         )
                     }
                 )

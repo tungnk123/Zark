@@ -7,7 +7,8 @@
     <string name="msg_login_title">Chào mừng bạn trở lại</string>
     <string name="msg_password">"Mật khẩu: "</string>
     <string name="msg_confirm_password">"Xác nhận mật khẩu: "</string>
-    <string name="msg_phone">"Số điện thoại: "</string>
+    <string name="msg_phone">"Email: "</string>
+    <string name="msg_display_name">"Name: "</string>
     <string name="msg_forget_password">Quên mật khẩu?</string>
     <string name="msg_asteroid">*</string>
     <string name="msg_login">Đăng nhập</string>
@@ -18,7 +19,7 @@
     <string name="msg_already_have_account">Bạn đã có tài khoản?</string>
     <string name="msg_confirm_term_privacy_policy">Bằng cách nhấn Đồng ý và tiếp tục, bạn đồng ý với các Điều khoản dịch vụ và Chính sách riêng tư của chúng tôi</string>
     <string name="msg_who_are_you">Bạn là ai?</string>
-    <string name="msg_sign_in_account">Đăng ký tài khoản SETCHAT</string>
+    <string name="msg_sign_in_account">Đăng ký tài khoản Zark</string>
     <string name="msg_term">Điều khoản dịch vụ</string>
     <string name="msg_privacy_policy">Chính sách riêng tư</string>
     <string name="msg_search_icon">Search Icon</string>
