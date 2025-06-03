@@ -35,6 +35,7 @@ import com.tungnk123.zark.ui.calendar.composables.ThreeDayView
 import com.tungnk123.zark.ui.calendar.composables.TimeAgendaView
 import com.tungnk123.zark.ui.navigation.NavigationBarMetadataItem
 import com.tungnk123.zark.utils.extensions.navigateToDestination
+import com.tungnk123.zark.utils.extensions.navigateToEventDetail
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -108,8 +109,19 @@ fun CalendarScreen(
             modifier = Modifier.padding(padding)
         ) {
             when (selectedCalendarType) {
-                CalendarType.SCHEDULE -> TimeAgendaView(filteredEvents)
-                CalendarType.DAY -> SingleDayView(filteredEvents)
+                CalendarType.SCHEDULE -> TimeAgendaView(
+                    events = filteredEvents,
+                    onEventClick = { event ->
+                        navController.navigateToEventDetail(event.id)
+                    })
+
+                CalendarType.DAY -> SingleDayView(
+                    events = filteredEvents,
+                    onEventClick = { event ->
+                        navController.navigateToEventDetail(event.id)
+                    }
+                )
+
                 CalendarType.THREE_DAY -> ThreeDayView(events)
                 CalendarType.WEEK -> ThreeDayView(events)
                 CalendarType.MONTH -> MonthCalendarView()

@@ -31,3 +31,7 @@ fun NavController.navigateToChat(conversationId: Int) {
     val route = "chat/$conversationId"
     this.navigate(route)
 }
+
+fun NavController.navigateToEventDetail(eventId: String) {
+    this.navigate("event_detail/$eventId")
+}

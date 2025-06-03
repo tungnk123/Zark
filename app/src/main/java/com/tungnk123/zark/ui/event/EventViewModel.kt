@@ -4,11 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tungnk123.zark.data.dto.calendar.CreateEventRequest
 import com.tungnk123.zark.repository.event.EventRepository
+import com.tungnk123.zark.ui.event.state.EventDetailUiState
 import com.tungnk123.zark.utils.TokenManager
 import com.tungnk123.zark.utils.extensions.printException
 import com.tungnk123.zark.utils.extensions.printLog
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -23,6 +27,9 @@ class EventViewModel @Inject constructor(
     companion object {
         private const val TAG = "EventViewModel"
     }
+
+    private val _eventDetailUiState = MutableStateFlow(EventDetailUiState())
+    val eventDetailUiState: StateFlow<EventDetailUiState> = _eventDetailUiState.asStateFlow()
 
     fun createEvent(
         title: String,
@@ -48,6 +55,31 @@ class EventViewModel @Inject constructor(
             }
             catch (e: Exception) {
                 e.printException(TAG)
+            }
+        }
+    }
+
+    fun getEventDetail(eventId: String) {
+        viewModelScope.launch {
+            _eventDetailUiState.value = EventDetailUiState(isLoading = true)
+
+            try {
+                val response = eventRepository.getEventByEventId(eventId)
+                if (response.statusCode == 200) {
+                    _eventDetailUiState.value = EventDetailUiState(
+                        eventDetail = response.message
+                    )
+                }
+                else {
+                    _eventDetailUiState.value = EventDetailUiState(
+                        error = "Failed to load event: ${response.message}"
+                    )
+                }
+            }
+            catch (e: Exception) {
+                _eventDetailUiState.value = EventDetailUiState(
+                    error = e.message ?: "Unknown error occurred"
+                )
             }
         }
     }

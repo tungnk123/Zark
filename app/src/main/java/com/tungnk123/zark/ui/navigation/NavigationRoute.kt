@@ -8,6 +8,7 @@ sealed class NavigationRoute(val route: String, val name: String = "") {
     data object Search : NavigationRoute("search", "Search")
     data object Calendar : NavigationRoute("calendar", "Lịch")
     data object AddEvent : NavigationRoute("add_event?eventRequestJson={eventRequestJson}", "Thêm sự kiện")
+    data object EventDetail : NavigationRoute("event_detail/{eventId}", "Thêm sự kiện")
     data object Workplace : NavigationRoute("workplace", "Nơi làm việc")
     data object Document : NavigationRoute("document", "Tài liệu")
     data object More : NavigationRoute("more", "Xem thêm")

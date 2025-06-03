@@ -31,6 +31,7 @@ import java.time.LocalTime
 @Composable
 fun SingleDayView(
     events: List<EventDetail>,
+    onEventClick: (EventDetail) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hourHeight = 60.dp
@@ -100,7 +101,10 @@ fun SingleDayView(
                             )
                             .offset(y = Dp(offsetY / LocalDensity.current.density))
                     ) {
-                        TaskItem(title = event.title)
+                        TaskItem(
+                            title = event.title,
+                            onItemClick = { onEventClick(event) }
+                        )
                     }
                 }
             }

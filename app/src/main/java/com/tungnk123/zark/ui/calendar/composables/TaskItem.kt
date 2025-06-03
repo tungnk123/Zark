@@ -1,6 +1,7 @@
 package com.tungnk123.zark.ui.calendar.composables
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,6 +17,7 @@ import androidx.compose.ui.zIndex
 @Composable
 fun TaskItem(
     title: String,
+    onItemClick: () -> Unit,
     modifier: Modifier = Modifier,
     color: Color = Color(0xFFBBDEFB),
 ) {
@@ -31,6 +33,7 @@ fun TaskItem(
                 color,
                 shape = RoundedCornerShape(8.dp)
             )
+            .clickable { onItemClick() }
             .padding(4.dp)
     ) {
         Text(

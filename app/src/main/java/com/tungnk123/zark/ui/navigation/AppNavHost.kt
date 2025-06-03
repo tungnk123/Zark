@@ -11,6 +11,7 @@ import com.tungnk123.zark.ui.calendar.CalendarScreen
 import com.tungnk123.zark.ui.calendar.CalendarViewModel
 import com.tungnk123.zark.ui.chat.ChatScreen
 import com.tungnk123.zark.ui.event.AddEventScreen
+import com.tungnk123.zark.ui.event.detail.EventDetailScreen
 import com.tungnk123.zark.ui.home.HomeScreen
 import com.tungnk123.zark.ui.login.LoginScreen
 import com.tungnk123.zark.ui.search.SearchScreen
@@ -82,6 +83,20 @@ fun AppNavHost(
             AddEventScreen(
                 navController = navController,
                 eventRequestJson = eventRequestJson
+            )
+        }
+        baseComposable(
+            item = NavigationBarMetadataItem.EventDetail,
+            arguments = listOf(
+                navArgument("eventId") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
+            EventDetailScreen(
+                navController = navController,
+                eventId = eventId
             )
         }
         baseComposable(NavigationBarMetadataItem.Workplace) {

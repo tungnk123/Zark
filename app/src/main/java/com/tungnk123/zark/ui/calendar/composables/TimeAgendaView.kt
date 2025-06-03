@@ -16,6 +16,7 @@ import com.tungnk123.zark.data.dto.calendar.EventDetail
 @Composable
 fun TimeAgendaView(
     events: List<EventDetail>,
+    onEventClick: (EventDetail) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val eventsByDate = events
@@ -42,6 +43,7 @@ fun TimeAgendaView(
 
                 TaskItem(
                     title = event.title,
+                    onItemClick = { onEventClick(event) }
                 )
                 Spacer(modifier = Modifier.height(4.dp))
             }
