@@ -2,7 +2,9 @@ package com.tungnk123.zark.ui.chat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tungnk123.zark.data.dto.calendar.CreateEventRequest
 import com.tungnk123.zark.data.dto.detectevent.ScheduleRequest
+import com.tungnk123.zark.repository.event.EventRepository
 import com.tungnk123.zark.repository.message.MessageRepository
 import com.tungnk123.zark.repository.schedule.ScheduleRepository
 import com.tungnk123.zark.ui.chat.state.ChatUiState
@@ -14,7 +16,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -23,6 +28,7 @@ import javax.inject.Inject
 class ChatViewModel @Inject constructor(
     private val messageRepository: MessageRepository,
     private val scheduleRepository: ScheduleRepository,
+    private val eventRepository: EventRepository,
     private val tokenManager: TokenManager,
 ) : ViewModel() {
 
@@ -162,17 +168,48 @@ class ChatViewModel @Inject constructor(
                     .toLocalDateTime()
                 val endTime = startTime.plusHours(1)
 
-//                val newEvent = CalendarDto(
-//                    id = UUID.randomUUID().toString(),
-//                    title = response.event,
-//                    startTime = startTime,
-//                    endTime = endTime
-//                )
-//
-//                addEvent(newEvent)
+                saveEventToUiState(
+                    title = response.event,
+                    description = response.event,
+                    startTime = startTime,
+                    endTime = endTime,
+                    participants = listOfNotNull(_uiState.value.currentUserId)
+                )
             }
             catch (e: Exception) {
                 e.printStackTrace()
+            }
+        }
+    }
+
+    fun saveEventToUiState(
+        title: String,
+        description: String,
+        startTime: LocalDateTime,
+        endTime: LocalDateTime,
+        participants: List<Int>,
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val currentUserId = tokenManager.userId.firstOrNull() ?: return@launch
+                val createEventRequest = CreateEventRequest(
+                    creatorId = currentUserId,
+                    title = title,
+                    description = description,
+                    startTime = startTime,
+                    endTime = endTime,
+                    participants = participants
+                )
+                "Event request in ChatViewModel: $createEventRequest".printLog("test_chat")
+                val json = Json { encodeDefaults = true }
+                val eventRequestJson = json.encodeToString(createEventRequest)
+
+                _uiState.update {
+                    it.copy(eventRequestJson = eventRequestJson)
+                }
+            }
+            catch (e: Exception) {
+                e.printException(TAG)
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.tungnk123.zark.ui.calendar
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -34,6 +35,7 @@ import com.tungnk123.zark.ui.calendar.composables.ThreeDayView
 import com.tungnk123.zark.ui.calendar.composables.TimeAgendaView
 import com.tungnk123.zark.ui.navigation.NavigationBarMetadataItem
 import com.tungnk123.zark.utils.extensions.navigateToDestination
+import com.tungnk123.zark.utils.extensions.navigateToEventDetail
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -45,7 +47,7 @@ fun CalendarScreen(
     modifier: Modifier = Modifier,
     calendarViewModel: CalendarViewModel = hiltViewModel(),
 ) {
-    var selectedType by remember { mutableStateOf(CalendarType.DAY) }
+    var selectedCalendarType by remember { mutableStateOf(CalendarType.DAY) }
     val topSheetState = rememberTopSheetState()
     val scope = rememberCoroutineScope()
     val events by calendarViewModel.events.collectAsStateWithLifecycle()
@@ -59,6 +61,24 @@ fun CalendarScreen(
             .toInstant()
             .toEpochMilli()
     )
+
+    val filteredEvents = remember(events, selectedDateTime) {
+        events.filter { event ->
+            event.startTime.toLocalDate() == selectedDateTime.toLocalDate()
+        }
+    }
+
+    LaunchedEffect(selectedCalendarType) {
+        calendarViewModel.getEvents()
+    }
+
+    LaunchedEffect(selectedDateTime) {
+        Log.d("CalendarScreen", "Events: $events")
+        Log.d("CalendarScreen", "Filtered Events: ${filteredEvents.size}")
+        filteredEvents.forEach {
+            Log.d("CalendarScreen", "Event: ${it.title} at ${it.startTime}")
+        }
+    }
 
     Scaffold(
         modifier = modifier,
@@ -88,9 +108,20 @@ fun CalendarScreen(
         Column(
             modifier = Modifier.padding(padding)
         ) {
-            when (selectedType) {
-                CalendarType.SCHEDULE -> TimeAgendaView(events)
-                CalendarType.DAY -> SingleDayView(events)
+            when (selectedCalendarType) {
+                CalendarType.SCHEDULE -> TimeAgendaView(
+                    events = filteredEvents,
+                    onEventClick = { event ->
+                        navController.navigateToEventDetail(event.id)
+                    })
+
+                CalendarType.DAY -> SingleDayView(
+                    events = filteredEvents,
+                    onEventClick = { event ->
+                        navController.navigateToEventDetail(event.id)
+                    }
+                )
+
                 CalendarType.THREE_DAY -> ThreeDayView(events)
                 CalendarType.WEEK -> ThreeDayView(events)
                 CalendarType.MONTH -> MonthCalendarView()
@@ -129,8 +160,8 @@ fun CalendarScreen(
 
     ChangeCalendarTypeTopSheet(
         topSheetState = topSheetState,
-        selectedType = selectedType,
-        onTypeSelected = { selectedType = it },
+        selectedType = selectedCalendarType,
+        onTypeSelected = { selectedCalendarType = it },
         onDismissRequest = { scope.launch { topSheetState.collapse() } }
     )
 }

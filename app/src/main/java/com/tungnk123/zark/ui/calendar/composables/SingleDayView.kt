@@ -22,18 +22,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.tungnk123.zark.R
-import com.tungnk123.zark.data.dto.calendar.CalendarDto
+import com.tungnk123.zark.data.dto.calendar.EventDetail
 import kotlinx.coroutines.delay
-import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
 fun SingleDayView(
-    events: List<CalendarDto>,
+    events: List<EventDetail>,
+    onEventClick: (EventDetail) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val hourHeight = 60.dp
@@ -103,7 +101,10 @@ fun SingleDayView(
                             )
                             .offset(y = Dp(offsetY / LocalDensity.current.density))
                     ) {
-                        TaskItem(title = event.title)
+                        TaskItem(
+                            title = event.title,
+                            onItemClick = { onEventClick(event) }
+                        )
                     }
                 }
             }

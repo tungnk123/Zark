@@ -38,7 +38,7 @@ class HomeViewModel @Inject constructor(
                         isLoading = false, contacts = contacts, error = null
                     )
                 }
-                catch (e: Exception) {9
+                catch (e: Exception) {
                     e.printException(TAG)
                     _uiState.value = _uiState.value.copy(
                         isLoading = false, error = e.message

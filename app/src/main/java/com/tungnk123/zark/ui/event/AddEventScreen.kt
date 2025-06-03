@@ -1,6 +1,7 @@
 package com.tungnk123.zark.ui.event
 
 import android.app.TimePickerDialog
+import android.util.Log
 import android.widget.TimePicker
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,9 +45,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.tungnk123.zark.data.dto.calendar.CalendarDto
-import com.tungnk123.zark.ui.calendar.CalendarViewModel
+import com.tungnk123.zark.data.dto.calendar.CreateEventRequest
 import com.tungnk123.zark.utils.extensions.printLog
+import kotlinx.serialization.json.Json
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -60,19 +64,55 @@ import kotlin.math.min
 @Composable
 fun AddEventScreen(
     navController: NavController,
+    eventRequestJson: String? = null,
     modifier: Modifier = Modifier,
-    calendarViewModel: CalendarViewModel = hiltViewModel(),
+    eventViewModel: EventViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
 
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var attendees by remember { mutableStateOf("") }  // Thêm biến lưu khách mời (chuỗi comma-separated)
-    var startDateTime by remember { mutableStateOf(LocalDateTime.now()) }
+    val eventRequest = remember(eventRequestJson) {
+        eventRequestJson?.let { json ->
+            try {
+                val decodedJson = URLDecoder.decode(
+                    json,
+                    StandardCharsets.UTF_8.toString()
+                )
+                Json.decodeFromString<CreateEventRequest>(decodedJson)
+                    .also {
+                        Log.d(
+                            "AddEventScreen",
+                            "Parsed CreateEventRequest: $it"
+                        )
+                    }
+            }
+            catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        "Event request json: $eventRequestJson".printLog("AddEventScreen")
+        "Event request: $eventRequest".printLog("AddEventScreen")
+    }
+
+    var title by remember { mutableStateOf(eventRequest?.title ?: "") }
+    var description by remember { mutableStateOf(eventRequest?.description ?: "") }
+    var attendees by remember {
+        mutableStateOf(
+            eventRequest?.participants?.joinToString(",") ?: ""
+        )
+    }
+
+    var startDateTime by remember {
+        mutableStateOf(
+            eventRequest?.startTime ?: LocalDateTime.now()
+        )
+    }
     var endDateTime by remember {
         mutableStateOf(
-            LocalDateTime.now()
-                .plusHours(1)
+            eventRequest?.endTime ?: startDateTime.plusHours(1)
         )
     }
 
@@ -123,16 +163,13 @@ fun AddEventScreen(
         bottomBar = {
             Button(
                 onClick = {
-                    val event = CalendarDto(
-                        id = System.currentTimeMillis()
-                            .toString(),
+                    eventViewModel.createEvent(
                         title = title,
                         description = description,
                         startTime = startDateTime,
                         endTime = endDateTime,
+                        participants = emptyList()
                     )
-                    "Current event: $event".printLog("test")
-                    calendarViewModel.addEvent(event)
                     navController.popBackStack()
                 },
                 enabled = title.isNotBlank(),

@@ -11,17 +11,19 @@ import com.tungnk123.zark.ui.calendar.CalendarScreen
 import com.tungnk123.zark.ui.calendar.CalendarViewModel
 import com.tungnk123.zark.ui.chat.ChatScreen
 import com.tungnk123.zark.ui.event.AddEventScreen
+import com.tungnk123.zark.ui.event.detail.EventDetailScreen
 import com.tungnk123.zark.ui.home.HomeScreen
 import com.tungnk123.zark.ui.login.LoginScreen
 import com.tungnk123.zark.ui.search.SearchScreen
 import com.tungnk123.zark.ui.signin.SignInScreen
 import com.tungnk123.zark.ui.workplace.WorkplaceScreen
+import com.tungnk123.zark.utils.extensions.printLog
 
 @Composable
 fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    startDestination: String = NavigationRoute.Login.route
+    startDestination: String = NavigationRoute.Login.route,
 ) {
     val calendarViewModel: CalendarViewModel = hiltViewModel()
     NavHost(
@@ -45,7 +47,8 @@ fun AppNavHost(
             )
         }
         baseComposable(
-            item = NavigationBarMetadataItem.Chat, arguments = listOf(
+            item = NavigationBarMetadataItem.Chat,
+            arguments = listOf(
                 navArgument("conversationId") { type = NavType.IntType })
         ) { backStackEntry ->
             val conversationId =
@@ -66,10 +69,34 @@ fun AppNavHost(
                 calendarViewModel = calendarViewModel
             )
         }
-        baseComposable(NavigationBarMetadataItem.AddEvent) {
+        baseComposable(
+            NavigationBarMetadataItem.AddEvent,
+            arguments = listOf(
+                navArgument("eventRequestJson") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                })
+        ) { backStackEntry ->
+            val eventRequestJson = backStackEntry.arguments?.getString("eventRequestJson")
+            "Event request json in AppNavHost: $eventRequestJson".printLog("test_nav")
             AddEventScreen(
                 navController = navController,
-                calendarViewModel = calendarViewModel
+                eventRequestJson = eventRequestJson
+            )
+        }
+        baseComposable(
+            item = NavigationBarMetadataItem.EventDetail,
+            arguments = listOf(
+                navArgument("eventId") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
+            EventDetailScreen(
+                navController = navController,
+                eventId = eventId
             )
         }
         baseComposable(NavigationBarMetadataItem.Workplace) {

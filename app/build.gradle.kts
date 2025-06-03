@@ -150,5 +150,9 @@ dependencies {
 
     // Calendar
     implementation(libs.top.sheet.compose)
-    implementation("com.kizitonwose.calendar:compose:2.6.2")
+    implementation(libs.calendar.compose)
+
+    // Coil
+    implementation(libs.coil.compose.v320)
+    implementation(libs.coil.network.okhttp)
 }
