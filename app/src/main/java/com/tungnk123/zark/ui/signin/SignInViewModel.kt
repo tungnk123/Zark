@@ -11,24 +11,34 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+
 @HiltViewModel
 class SignInViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
+
+    private val _eventFlow = MutableSharedFlow<String>()
+    val eventFlow = _eventFlow.asSharedFlow()
+
     fun registerUser(
         email: String,
         password: String,
-        displayName: String = ""
+        displayName: String = "",
+        fcmToken: String = ""
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = userRepository.registerUser(
-                    SignInRequest(email, password, displayName)
+                    SignInRequest(email, password, displayName, fcmToken)
                 )
                 "Response: $response".printLog("test_res")
-            }
-            catch (e: Exception) {
+
+                _eventFlow.emit("Đăng ký tài khoản thành công")
+            } catch (e: Exception) {
                 e.printException(tag = "test_res")
+                _eventFlow.emit("Đăng ký thất bại: ${e.message}")
             }
         }
     }
