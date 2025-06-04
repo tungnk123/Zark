@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "472221294433",
+    "project_id": "zarkchat-efa26",
+    "storage_bucket": "zarkchat-efa26.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:472221294433:android:760dfa0b26715e4831ef20",
+        "android_client_info": {
+          "package_name": "com.tungnk123.zark"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbSXU0FsQduSZnOzdLCrgbRN4Tneua6wE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
