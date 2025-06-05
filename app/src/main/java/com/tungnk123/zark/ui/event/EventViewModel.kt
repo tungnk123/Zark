@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -79,6 +80,17 @@ class EventViewModel @Inject constructor(
             catch (e: Exception) {
                 _eventDetailUiState.value = EventDetailUiState(
                     error = e.message ?: "Unknown error occurred"
+                )
+            }
+        }
+    }
+
+    fun checkDoneEventByEventId(eventId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = eventRepository.checkDoneEventByEventId(eventId)
+            _eventDetailUiState.update {
+                it.copy(
+                    isDone = result.statusCode == 200
                 )
             }
         }

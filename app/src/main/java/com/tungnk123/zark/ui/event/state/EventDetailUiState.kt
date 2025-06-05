@@ -6,4 +6,5 @@ data class EventDetailUiState(
     val isLoading: Boolean = false,
     val eventDetail: EventDetail? = null,
     val error: String? = null,
+    val isDone: Boolean = false
 )
