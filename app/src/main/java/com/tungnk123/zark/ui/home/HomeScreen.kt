@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.tungnk123.zark.ui.chat.ChatViewModel
 import com.tungnk123.zark.ui.home.composables.HomeTopBar
 import com.tungnk123.zark.ui.home.composables.SwipeChatItem
 import com.tungnk123.zark.ui.navigation.NavigationBarMetadataItem
@@ -31,13 +32,15 @@ import com.tungnk123.zark.utils.extensions.printException
 fun HomeScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
-    homeViewModel: HomeViewModel = hiltViewModel()
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    chatViewModel: ChatViewModel = hiltViewModel()
 ) {
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         homeViewModel.fetchConversations()
+        chatViewModel.startConnection()
     }
 
     LaunchedEffect(uiState.error) {
