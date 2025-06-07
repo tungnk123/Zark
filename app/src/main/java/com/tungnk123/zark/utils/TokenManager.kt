@@ -19,12 +19,16 @@ class TokenManager @Inject constructor(@ApplicationContext private val context: 
     companion object {
         val TOKEN_KEY = stringPreferencesKey("auth_token")
         val USER_ID = intPreferencesKey("user_id")
+        val FCM_TOKEN_KEY = stringPreferencesKey("fcm_token")
     }
 
     val token: Flow<String?> = context.dataStore.data
         .map { it[TOKEN_KEY] }
 
     val userId: Flow<Int?> = context.dataStore.data.map { it[USER_ID] }
+
+    val fcmToken: Flow<String?> = context.dataStore.data
+        .map { it[FCM_TOKEN_KEY] }
 
     suspend fun saveLoginResponse(response: LoginResponse) {
         context.dataStore.edit { it[TOKEN_KEY] = response.token }
@@ -50,5 +54,13 @@ class TokenManager @Inject constructor(@ApplicationContext private val context: 
 
     suspend fun clearUserId() {
         context.dataStore.edit { it.remove(USER_ID) }
+    }
+
+    suspend fun saveFcmToken(token: String) {
+        context.dataStore.edit { it[FCM_TOKEN_KEY] = token }
+    }
+
+    suspend fun clearFcmToken() {
+        context.dataStore.edit { it.remove(FCM_TOKEN_KEY) }
     }
 }

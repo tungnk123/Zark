@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import com.tungnk123.zark.ui.calendar.CalendarScreen
 import com.tungnk123.zark.ui.calendar.CalendarViewModel
 import com.tungnk123.zark.ui.chat.ChatScreen
+import com.tungnk123.zark.ui.chat.ChatViewModel
 import com.tungnk123.zark.ui.event.AddEventScreen
 import com.tungnk123.zark.ui.event.detail.EventDetailScreen
 import com.tungnk123.zark.ui.home.HomeScreen
@@ -26,6 +27,7 @@ fun AppNavHost(
     startDestination: String = NavigationRoute.Login.route,
 ) {
     val calendarViewModel: CalendarViewModel = hiltViewModel()
+    val chatViewModel: ChatViewModel = hiltViewModel()
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -43,7 +45,8 @@ fun AppNavHost(
         }
         baseComposable(NavigationBarMetadataItem.Home) {
             HomeScreen(
-                navController = navController
+                navController = navController,
+                chatViewModel = chatViewModel
             )
         }
         baseComposable(
@@ -56,6 +59,7 @@ fun AppNavHost(
             ChatScreen(
                 navController = navController,
                 conversationId = conversationId,
+                chatViewModel = chatViewModel
             )
         }
 
