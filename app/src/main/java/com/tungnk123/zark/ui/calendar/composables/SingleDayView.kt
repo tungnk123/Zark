@@ -103,6 +103,7 @@ fun SingleDayView(
                     ) {
                         TaskItem(
                             title = event.title,
+                            isDone = event.status == true,
                             onItemClick = { onEventClick(event) }
                         )
                     }
