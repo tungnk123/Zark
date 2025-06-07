@@ -87,11 +87,34 @@ class EventViewModel @Inject constructor(
 
     fun checkDoneEventByEventId(eventId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = eventRepository.checkDoneEventByEventId(eventId)
-            _eventDetailUiState.update {
-                it.copy(
-                    isDone = result.statusCode == 200
-                )
+            try {
+                _eventDetailUiState.update { currentState ->
+                    currentState.copy(
+                        eventDetail = currentState.eventDetail?.copy(status = true),
+                        isDone = true
+                    )
+                }
+
+                val result = eventRepository.checkDoneEventByEventId(eventId)
+
+                if (result.statusCode != 200) {
+                    _eventDetailUiState.update { currentState ->
+                        currentState.copy(
+                            eventDetail = currentState.eventDetail?.copy(status = false),
+                            isDone = false,
+                            error = "Failed to mark event as done"
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _eventDetailUiState.update { currentState ->
+                    currentState.copy(
+                        eventDetail = currentState.eventDetail?.copy(status = false),
+                        isDone = false,
+                        error = e.message ?: "Failed to mark event as done"
+                    )
+                }
+                e.printException(TAG)
             }
         }
     }

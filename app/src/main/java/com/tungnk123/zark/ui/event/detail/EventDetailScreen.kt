@@ -57,7 +57,6 @@ import com.tungnk123.zark.data.dto.calendar.Participant
 import com.tungnk123.zark.ui.event.EventViewModel
 import com.tungnk123.zark.utils.extensions.printLog
 import java.time.Duration
-import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
