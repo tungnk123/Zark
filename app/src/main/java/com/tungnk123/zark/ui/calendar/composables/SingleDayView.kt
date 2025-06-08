@@ -15,7 +15,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,7 +47,6 @@ fun SingleDayView(
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-        // Background: Hour labels and dividers
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize()
@@ -77,7 +75,6 @@ fun SingleDayView(
                         )
                     }
 
-                    // Current time indicator
                     if (hour == currentTime.hour) {
                         val minuteOffset = currentTime.minute
                         val offsetY = with(LocalDensity.current) {
@@ -99,37 +96,32 @@ fun SingleDayView(
             }
         }
 
-        // Foreground: Events positioned absolutely
         events.forEach { event ->
             val eventHour = event.startTime.hour
             val eventMinute = event.startTime.minute
 
-            // Calculate the absolute position from top (without scroll adjustment)
             val absolutePositionFromTop = with(LocalDensity.current) {
                 (eventHour * hourHeight.value + (eventMinute / 60f) * hourHeight.value).dp
             }
 
-            // Calculate scroll offset to adjust position
             val scrollOffsetDp = with(LocalDensity.current) {
                 val firstVisibleItemOffset = listState.firstVisibleItemScrollOffset.toDp()
                 val firstVisibleItemPosition = (listState.firstVisibleItemIndex * hourHeight.value).dp
                 firstVisibleItemPosition + firstVisibleItemOffset
             }
 
-            // Final position relative to visible area
             val finalYPosition = absolutePositionFromTop - scrollOffsetDp
 
-            // Only render if the event is in visible area (with some buffer)
             val isInVisibleArea = finalYPosition > -100.dp && finalYPosition < 800.dp // Adjust buffer as needed
 
             if (isInVisibleArea) {
                 Box(
                     modifier = Modifier
                         .offset(
-                            x = 76.dp, // 60dp for time + 16dp padding
+                            x = 76.dp,
                             y = finalYPosition
                         )
-                        .padding(end = 32.dp) // Account for right padding
+                        .padding(end = 32.dp)
                 ) {
                     TaskItem(
                         title = event.title,
