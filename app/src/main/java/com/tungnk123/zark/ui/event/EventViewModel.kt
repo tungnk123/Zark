@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -80,6 +81,40 @@ class EventViewModel @Inject constructor(
                 _eventDetailUiState.value = EventDetailUiState(
                     error = e.message ?: "Unknown error occurred"
                 )
+            }
+        }
+    }
+
+    fun checkDoneEventByEventId(eventId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _eventDetailUiState.update { currentState ->
+                    currentState.copy(
+                        eventDetail = currentState.eventDetail?.copy(status = true),
+                        isDone = true
+                    )
+                }
+
+                val result = eventRepository.checkDoneEventByEventId(eventId)
+
+                if (result.statusCode != 200) {
+                    _eventDetailUiState.update { currentState ->
+                        currentState.copy(
+                            eventDetail = currentState.eventDetail?.copy(status = false),
+                            isDone = false,
+                            error = "Failed to mark event as done"
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _eventDetailUiState.update { currentState ->
+                    currentState.copy(
+                        eventDetail = currentState.eventDetail?.copy(status = false),
+                        isDone = false,
+                        error = e.message ?: "Failed to mark event as done"
+                    )
+                }
+                e.printException(TAG)
             }
         }
     }

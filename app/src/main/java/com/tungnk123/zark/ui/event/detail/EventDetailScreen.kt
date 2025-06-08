@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -16,9 +18,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -28,6 +33,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -144,6 +150,9 @@ fun EventDetailScreen(
                 if (eventDetail != null) {
                     EventDetailContent(
                         eventDetail = eventDetail,
+                        onCheckDone = {
+                            eventViewModel.checkDoneEventByEventId(eventId)
+                        },
                         modifier = Modifier.padding(padding)
                     )
                 }
@@ -156,6 +165,7 @@ fun EventDetailScreen(
 @Composable
 private fun EventDetailContent(
     eventDetail: EventDetail,
+    onCheckDone: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val dateFormatter = DateTimeFormatter.ofPattern(
@@ -220,6 +230,31 @@ private fun EventDetailContent(
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
+
+                // Event Status Badge
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = if (eventDetail.status == true) Color(0xFF4CAF50) else Color(0xFF9E9E9E),
+                                shape = CircleShape
+                            )
+                            .padding(
+                                horizontal = 12.dp,
+                                vertical = 4.dp
+                            )
+                    ) {
+                        Text(
+                            text = if (eventDetail.status == true) "COMPLETED" else "PENDING",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
             }
         }
 
@@ -248,6 +283,12 @@ private fun EventDetailContent(
                     icon = Icons.Default.Schedule,
                     title = "Duration",
                     content = durationText
+                )
+
+                DetailRow(
+                    icon = Icons.Default.CheckCircle,
+                    title = "Status",
+                    content = if (eventDetail.status == true) "Completed" else "Pending"
                 )
             }
         }
@@ -319,6 +360,56 @@ private fun EventDetailContent(
                 }
             }
         }
+
+        // Check Done Button Section
+        if (eventDetail.status != true) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+                elevation = CardDefaults.cardElevation(2.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "Event Completed",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = "This event has ended. Mark it as done if you have completed it.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = { /* Handle "Not Done" if needed */ },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Not Done")
+                        }
+
+                        Button(
+                            onClick = onCheckDone,
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF4CAF50)
+                            )
+                        ) {
+                            Text("Mark Done")
+                        }
+                    }
+                }
+            }
+        }
+
+        // Add some bottom padding to account for the floating action button
+        Spacer(modifier = Modifier.height(80.dp))
     }
 }
 
