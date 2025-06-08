@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +37,7 @@ fun SingleDayView(
     modifier: Modifier = Modifier,
 ) {
     val hourHeight = 60.dp
+    val listState = rememberLazyListState()
 
     var currentTime by remember { mutableStateOf(LocalTime.now()) }
     LaunchedEffect(Unit) {
@@ -44,69 +47,95 @@ fun SingleDayView(
         }
     }
 
-    LazyColumn(modifier = modifier.fillMaxSize()) {
-        items(24) { hour ->
-            val eventsInHour = events.filter { it.startTime.hour == hour }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(hourHeight)
-                    .padding(horizontal = 16.dp)
-            ) {
-                Row(
+    Box(modifier = modifier.fillMaxSize()) {
+        // Background: Hour labels and dividers
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(24) { hour ->
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .align(Alignment.TopStart),
-                    verticalAlignment = Alignment.CenterVertically
+                        .height(hourHeight)
+                        .padding(horizontal = 16.dp)
                 ) {
-                    Text(
-                        text = "%02d:00".format(hour),
-                        modifier = Modifier.width(60.dp)
-                    )
-                    HorizontalDivider(
-                        modifier = Modifier.weight(1f),
-                        thickness = 1.dp,
-                        color = Color.Black
-                    )
-                }
-
-                if (hour == currentTime.hour) {
-                    val minuteOffset = currentTime.minute
-                    val offsetY = with(LocalDensity.current) {
-                        (minuteOffset / 60f) * hourHeight.toPx()
-                    }
-
-                    Box(
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(2.dp)
-                            .offset(
-                                y = Dp(offsetY / LocalDensity.current.density),
-                                x = 60.dp
-                            )
-                            .background(Color.Red)
-                    )
-                }
-                eventsInHour.forEach { event ->
-                    val minuteOffset = event.startTime.minute
-                    val offsetY = with(LocalDensity.current) {
-                        (minuteOffset / 60f) * hourHeight.toPx()
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .padding(
-                                start = 60.dp
-                            )
-                            .offset(y = Dp(offsetY / LocalDensity.current.density))
+                            .align(Alignment.TopStart),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TaskItem(
-                            title = event.title,
-                            isDone = event.status == true,
-                            onItemClick = { onEventClick(event) }
+                        Text(
+                            text = "%02d:00".format(hour),
+                            modifier = Modifier.width(60.dp)
+                        )
+                        HorizontalDivider(
+                            modifier = Modifier.weight(1f),
+                            thickness = 1.dp,
+                            color = Color.LightGray
                         )
                     }
+
+                    // Current time indicator
+                    if (hour == currentTime.hour) {
+                        val minuteOffset = currentTime.minute
+                        val offsetY = with(LocalDensity.current) {
+                            (minuteOffset / 60f) * hourHeight.toPx()
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(2.dp)
+                                .offset(
+                                    y = Dp(offsetY / LocalDensity.current.density),
+                                    x = 60.dp
+                                )
+                                .background(Color.Red)
+                        )
+                    }
+                }
+            }
+        }
+
+        // Foreground: Events positioned absolutely
+        events.forEach { event ->
+            val eventHour = event.startTime.hour
+            val eventMinute = event.startTime.minute
+
+            // Calculate the absolute position from top (without scroll adjustment)
+            val absolutePositionFromTop = with(LocalDensity.current) {
+                (eventHour * hourHeight.value + (eventMinute / 60f) * hourHeight.value).dp
+            }
+
+            // Calculate scroll offset to adjust position
+            val scrollOffsetDp = with(LocalDensity.current) {
+                val firstVisibleItemOffset = listState.firstVisibleItemScrollOffset.toDp()
+                val firstVisibleItemPosition = (listState.firstVisibleItemIndex * hourHeight.value).dp
+                firstVisibleItemPosition + firstVisibleItemOffset
+            }
+
+            // Final position relative to visible area
+            val finalYPosition = absolutePositionFromTop - scrollOffsetDp
+
+            // Only render if the event is in visible area (with some buffer)
+            val isInVisibleArea = finalYPosition > -100.dp && finalYPosition < 800.dp // Adjust buffer as needed
+
+            if (isInVisibleArea) {
+                Box(
+                    modifier = Modifier
+                        .offset(
+                            x = 76.dp, // 60dp for time + 16dp padding
+                            y = finalYPosition
+                        )
+                        .padding(end = 32.dp) // Account for right padding
+                ) {
+                    TaskItem(
+                        title = event.title,
+                        isDone = event.status == true,
+                        onItemClick = { onEventClick(event) }
+                    )
                 }
             }
         }
