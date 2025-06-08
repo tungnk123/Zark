@@ -231,7 +231,6 @@ private fun EventDetailContent(
                     )
                 }
 
-                // Event Status Badge
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -248,7 +247,7 @@ private fun EventDetailContent(
                             )
                     ) {
                         Text(
-                            text = if (eventDetail.status == true) "COMPLETED" else "PENDING",
+                            text = if (eventDetail.status) "COMPLETED" else "PENDING",
                             style = MaterialTheme.typography.labelSmall,
                             color = Color.White,
                             fontWeight = FontWeight.Medium
