@@ -44,7 +44,6 @@ class ChatViewModel @Inject constructor(
             val userId = tokenManager.userId.firstOrNull()
             _uiState.value = _uiState.value.copy(currentUserId = userId)
         }
-        startConnection()
     }
 
     private fun updateState(update: ChatUiState.() -> ChatUiState) {
