@@ -1,6 +1,5 @@
 package com.tungnk123.zark.ui.search.composables
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,12 +12,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ContactMail
-import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,29 +27,27 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil3.Uri
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.tungnk123.zark.R
-import com.tungnk123.zark.data.dto.conversation.ConversationSearchResponse
-import com.tungnk123.zark.ui.theme.ZarkTheme
+import com.tungnk123.zark.data.dto.user.UserDto
 
 @Composable
-fun SearchConversationItem(
-    conversation: ConversationSearchResponse,
-    onChatItemClick: () -> Unit,
+fun SearchUserItem(
+    user: UserDto,
+    onUserClick: () -> Unit,
+    onStartChatClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
-    @DrawableRes defaultLogoResId: Int = R.drawable.ic_logo,
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onChatItemClick() }
+            .clickable { onUserClick() }
             .padding(vertical = 4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -63,14 +60,8 @@ fun SearchConversationItem(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Avatar
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-            ) {
-                if (conversation.avatar.isNullOrBlank()) {
-                    // Fallback avatar based on conversation type
+            Box {
+                if (user.avatarUrl.isNullOrBlank()) {
                     Box(
                         modifier = Modifier
                             .size(48.dp)
@@ -79,11 +70,8 @@ fun SearchConversationItem(
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = when (conversation.type) {
-                                "group" -> Icons.Default.Group
-                                else -> Icons.Default.Person
-                            },
-                            contentDescription = "Conversation Avatar",
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Default Avatar",
                             tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(24.dp)
                         )
@@ -92,10 +80,10 @@ fun SearchConversationItem(
                 else {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(conversation.avatar)
+                            .data(user.avatarUrl)
                             .crossfade(true)
                             .build(),
-                        contentDescription = "Conversation Avatar",
+                        contentDescription = null,
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape),
@@ -103,25 +91,25 @@ fun SearchConversationItem(
                     )
                 }
 
-                // New conversation indicator
-                if (conversation.isNew == true) {
+                // Online indicator
+                if (user.isValidAccount) {
                     Box(
                         modifier = Modifier
                             .size(14.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary)
+                            .background(Color.Green)
                             .align(Alignment.BottomEnd)
                     )
                 }
             }
 
-            // Conversation Info
+            // User Info
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = conversation.name.orEmpty(),
+                    text = user.displayName,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
@@ -130,78 +118,39 @@ fun SearchConversationItem(
                 )
 
                 Text(
-                    text = when (conversation.type) {
-                        "group" -> "group message"
-                        "direct" -> "direct message"
-                        else -> "conversation"
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    text = user.email,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
+
+                if (user.isValidAccount) {
+                    Text(
+                        text = stringResource(R.string.msg_active_user),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Green,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
 
-            // Action icon
-            Icon(
-                imageVector = Icons.Default.ContactMail,
-                contentDescription = "Open conversation",
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
-            )
-        }
-    }
-}
-
-// Overloaded version for backward compatibility
-@Composable
-fun SearchConversationItem(
-    name: String,
-    logoUrl: Uri? = null,
-    onChatItemClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    @DrawableRes defaultLogoResId: Int = R.drawable.ic_logo,
-) {
-    val conversation = ConversationSearchResponse(
-        name = name,
-        avatar = logoUrl?.toString(),
-        type = "direct"
-    )
-
-    SearchConversationItem(
-        conversation = conversation,
-        onChatItemClick = onChatItemClick,
-        modifier = modifier,
-        defaultLogoResId = defaultLogoResId
-    )
-}
-
-@Preview
-@Composable
-fun PreviewSearchConversationItem() {
-    ZarkTheme {
-        Column {
-            SearchConversationItem(
-                conversation = ConversationSearchResponse(
-                    conversationId = 1,
-                    name = "Tran Yii",
-                    type = "direct",
-                    avatar = null,
-                    isNew = false,
-                    userId = 123
-                ),
-                onChatItemClick = {}
-            )
-
-            SearchConversationItem(
-                conversation = ConversationSearchResponse(
-                    conversationId = 2,
-                    name = "Development Team",
-                    type = "group",
-                    avatar = null,
-                    isNew = true,
-                    userId = null
-                ),
-                onChatItemClick = {}
-            )
+            if (onStartChatClick != null) {
+                IconButton(
+                    onClick = { onStartChatClick() },
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Chat,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
         }
     }
 }

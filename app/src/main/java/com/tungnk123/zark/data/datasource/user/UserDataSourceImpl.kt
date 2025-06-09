@@ -16,4 +16,15 @@ class UserDataSourceImpl @Inject constructor(
         userService.loginUser(loginRequest)
 
     override suspend fun getUserIdByEmail(email: String) = userService.getUserIdByEmail(email)
+    override suspend fun searchUsers(
+        name: String?,
+        email: String?,
+        page: Int,
+        pageSize: Int,
+    ) = userService.searchUsers(
+        name,
+        email,
+        page,
+        pageSize
+    )
 }

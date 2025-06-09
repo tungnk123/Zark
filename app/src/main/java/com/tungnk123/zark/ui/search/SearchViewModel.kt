@@ -3,12 +3,14 @@ package com.tungnk123.zark.ui.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tungnk123.zark.repository.conversation.ConversationRepository
+import com.tungnk123.zark.repository.user.UserRepository
 import com.tungnk123.zark.ui.search.state.SearchUiState
 import com.tungnk123.zark.utils.AppConstants
 import com.tungnk123.zark.utils.extensions.printException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -23,6 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     private val conversationRepository: ConversationRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
@@ -37,13 +40,60 @@ class SearchViewModel @Inject constructor(
                 .filter { it.isNotBlank() }
                 .distinctUntilChanged()
                 .collectLatest { query ->
-                    searchConversationByQuery(query)
+                    searchAll(query)
                 }
         }
     }
 
     fun onQueryChanged(newQuery: String) {
         _query.value = newQuery
+
+        if (newQuery.isBlank()) {
+            _uiState.update {
+                it.copy(
+                    searchContacts = emptyList(),
+                    searchUsers = emptyList(),
+                    isLoading = false,
+                    error = null
+                )
+            }
+        }
+    }
+
+    private fun searchAll(query: String) {
+        _uiState.update {
+            it.copy(
+                isLoading = true,
+                error = null
+            )
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val conversationDeferred = async { conversationRepository.searchConversationByQuery(query) }
+                val userDeferred = async { searchUsers(query) }
+
+                val searchResults = conversationDeferred.await()
+                val userResults = userDeferred.await()
+
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        searchContacts = searchResults,
+                        searchUsers = userResults
+                    )
+                }
+            }
+            catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
+                e.printException(TAG)
+            }
+        }
     }
 
     fun searchConversationByQuery(query: String) {
@@ -67,6 +117,87 @@ class SearchViewModel @Inject constructor(
             catch (e: Exception) {
                 _uiState.update {
                     _uiState.value.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
+                e.printException(TAG)
+            }
+        }
+    }
+
+    private suspend fun searchUsers(query: String) = try {
+        val response = userRepository.searchUsers(
+            name = query,
+            email = query,
+            page = 1,
+            pageSize = 20
+        )
+        response.data
+    } catch (e: Exception) {
+        e.printException("$TAG - searchUsers")
+        emptyList()
+    }
+
+    fun searchUsersByName(name: String) {
+        _uiState.update {
+            it.copy(
+                isLoading = true,
+                error = null
+            )
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = userRepository.searchUsers(
+                    name = name,
+                    page = 1,
+                    pageSize = 20
+                )
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        searchUsers = response.data
+                    )
+                }
+            }
+            catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
+                e.printException(TAG)
+            }
+        }
+    }
+
+    fun searchUsersByEmail(email: String) {
+        _uiState.update {
+            it.copy(
+                isLoading = true,
+                error = null
+            )
+        }
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = userRepository.searchUsers(
+                    email = email,
+                    page = 1,
+                    pageSize = 20
+                )
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        searchUsers = response.data
+                    )
+                }
+            }
+            catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
                         isLoading = false,
                         error = e.message
                     )

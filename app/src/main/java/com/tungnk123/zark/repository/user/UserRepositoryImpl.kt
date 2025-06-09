@@ -2,6 +2,7 @@ package com.tungnk123.zark.repository.user
 
 import com.tungnk123.zark.data.datasource.user.UserDataSource
 import com.tungnk123.zark.data.dto.user.LoginRequest
+import com.tungnk123.zark.data.dto.user.PaginatedUserResponse
 import com.tungnk123.zark.data.dto.user.SignInRequest
 import javax.inject.Inject
 
@@ -16,4 +17,15 @@ class UserRepositoryImpl @Inject constructor(
         userDataSource.loginUser(loginRequest)
 
     override suspend fun getUserIdByEmail(email: String) = userDataSource.getUserIdByEmail(email)
+    override suspend fun searchUsers(
+        name: String?,
+        email: String?,
+        page: Int,
+        pageSize: Int,
+    ): PaginatedUserResponse = userDataSource.searchUsers(
+        name,
+        email,
+        page,
+        pageSize
+    )
 }
