@@ -7,5 +7,12 @@ data class CreateConversationRequest(
     val creatorId: Int,
     val participantIds: List<Int>,
     val type: String,
-    val name: String
+    val name: String,
+    val encryptedSessionKeys: List<EncryptedSessionKey>
+)
+
+@Serializable
+data class EncryptedSessionKey(
+    val userId: Int,
+    val encryptedSessionKey: String
 )

@@ -41,6 +41,7 @@ class SignalRManager @Inject constructor(
         onMessageReceived: (Int, Int, String, String, String) -> Unit,
         onError: (Throwable) -> Unit
     ) {
+        if (isConnected()) return
         val token = tokenManager.token.firstOrNull()
         if (token == null) {
             "Token is null, cannot connect".printLog(TAG)
