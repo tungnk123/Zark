@@ -27,7 +27,6 @@ fun AppNavHost(
     startDestination: String = NavigationRoute.Login.route,
 ) {
     val calendarViewModel: CalendarViewModel = hiltViewModel()
-    val chatViewModel: ChatViewModel = hiltViewModel()
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -46,7 +45,6 @@ fun AppNavHost(
         baseComposable(NavigationBarMetadataItem.Home) {
             HomeScreen(
                 navController = navController,
-                chatViewModel = chatViewModel
             )
         }
         baseComposable(
@@ -59,7 +57,6 @@ fun AppNavHost(
             ChatScreen(
                 navController = navController,
                 conversationId = conversationId,
-                chatViewModel = chatViewModel
             )
         }
 
