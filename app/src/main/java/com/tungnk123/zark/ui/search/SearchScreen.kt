@@ -56,6 +56,12 @@ fun SearchScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        searchViewModel.navigateToConversation.collect { conversationId ->
+            navController.navigateToChat(conversationId)
+        }
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -219,17 +225,7 @@ fun SearchScreen(
                                     }
                                 },
                                 onStartChatClick = {
-                                    try {
-                                        // Start new conversation with user
-                                        startNewConversationWithUser(
-                                            user,
-                                            navController,
-                                            searchViewModel
-                                        )
-                                    }
-                                    catch (e: Exception) {
-                                        e.printException("SearchScreen_StartChat")
-                                    }
+                                    searchViewModel.startNewConversationWithUser(user)
                                 })
                         }
                     }
@@ -252,16 +248,4 @@ private fun handleUserClick(
     // TODO
     // Navigate to user profile or show user details
     // Example: navController.navigate("user_profile/${user.id}")
-}
-
-private fun startNewConversationWithUser(
-    user: UserDto,
-    navController: NavController,
-    searchViewModel: SearchViewModel,
-) {
-    // TODO
-    // Create new conversation with the user and navigate to chat
-    // Example:
-    // val conversationId = conversationRepository.createConversation(user.id)
-    // navController.navigateToChat(conversationId)
 }
