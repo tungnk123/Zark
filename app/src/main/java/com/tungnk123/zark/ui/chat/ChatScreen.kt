@@ -80,6 +80,7 @@ fun ChatScreen(
 
     LaunchedEffect(Unit) {
         chatViewModel.getAllMessages(conversationId)
+        chatViewModel.startConnection()
     }
 
     LaunchedEffect(allMessages.size) {
