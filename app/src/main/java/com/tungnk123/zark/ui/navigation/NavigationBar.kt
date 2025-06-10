@@ -62,7 +62,7 @@ fun BottomNavigationBar(
                                 painter = painterResource(iconRes),
                                 contentDescription = tab.navigationRoute.route,
                                 modifier = Modifier
-                                    .width(20.dp)
+                                    .width(32.dp)
                             )
                         }
                     },
@@ -70,7 +70,7 @@ fun BottomNavigationBar(
                         Text(
                             text = tab.navigationRoute.name,
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize = 8.sp
+                                fontSize = 10.sp
                             ),
                             textAlign = TextAlign.Center,
                             overflow = TextOverflow.Ellipsis,
