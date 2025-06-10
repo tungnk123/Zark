@@ -10,11 +10,11 @@ import androidx.navigation.navArgument
 import com.tungnk123.zark.ui.calendar.CalendarScreen
 import com.tungnk123.zark.ui.calendar.CalendarViewModel
 import com.tungnk123.zark.ui.chat.ChatScreen
-import com.tungnk123.zark.ui.chat.ChatViewModel
 import com.tungnk123.zark.ui.event.AddEventScreen
 import com.tungnk123.zark.ui.event.detail.EventDetailScreen
 import com.tungnk123.zark.ui.home.HomeScreen
 import com.tungnk123.zark.ui.login.LoginScreen
+import com.tungnk123.zark.ui.profile.ProfileScreen
 import com.tungnk123.zark.ui.search.SearchScreen
 import com.tungnk123.zark.ui.signin.SignInScreen
 import com.tungnk123.zark.ui.workplace.WorkplaceScreen
@@ -102,6 +102,11 @@ fun AppNavHost(
         }
         baseComposable(NavigationBarMetadataItem.Workplace) {
             WorkplaceScreen(
+                navController = navController
+            )
+        }
+        baseComposable(NavigationBarMetadataItem.More) {
+            ProfileScreen(
                 navController = navController
             )
         }
