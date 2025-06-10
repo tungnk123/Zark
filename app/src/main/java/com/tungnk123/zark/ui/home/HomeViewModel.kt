@@ -43,10 +43,10 @@ class HomeViewModel @Inject constructor(
                     isLoading = false, error = e.message
                 )
             }
-            delay(AppConstants.DELAY_POLLING_CONTACT)
-            while (isActive) {
-
-            }
+//            delay(AppConstants.DELAY_POLLING_CONTACT)
+//            while (isActive) {
+//
+//            }
         }
     }
 }

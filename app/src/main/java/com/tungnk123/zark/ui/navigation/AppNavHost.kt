@@ -47,7 +47,6 @@ fun AppNavHost(
         baseComposable(NavigationBarMetadataItem.Home) {
             HomeScreen(
                 navController = navController,
-                chatViewModel = chatViewModel
             )
         }
         baseComposable(

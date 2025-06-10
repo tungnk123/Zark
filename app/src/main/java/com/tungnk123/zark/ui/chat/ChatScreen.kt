@@ -80,6 +80,7 @@ fun ChatScreen(
 
     LaunchedEffect(Unit) {
         chatViewModel.getAllMessages(conversationId)
+        chatViewModel.startConnection()
     }
 
     LaunchedEffect(allMessages.size) {
@@ -116,11 +117,11 @@ fun ChatScreen(
                 placeholder = "Chat with $conversationId",
                 onSendClick = {
                     if (isConnected && message.isNotBlank()) {
-                        chatViewModel.processText(message)
                         chatViewModel.sendMessage(
                             conversationId = conversationId,
                             content = message
                         )
+                        chatViewModel.processText(message)
                         message = ""
                         isTyping = false
                     }
