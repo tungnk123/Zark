@@ -4,8 +4,18 @@ import android.net.Uri
 import androidx.navigation.NavController
 import com.tungnk123.zark.ui.navigation.NavigationBarMetadataItem
 
-fun NavController.navigateToDestination(destination: NavigationBarMetadataItem) {
-    this.navigate(destination.navigationRoute.route)
+fun NavController.navigateToDestination(
+    destination: NavigationBarMetadataItem,
+    clearBackStack: Boolean = false,
+) {
+    this.navigate(destination.navigationRoute.route) {
+        if (clearBackStack) {
+            popUpTo(graph.startDestinationId) {
+                inclusive = true
+            }
+            launchSingleTop = true
+        }
+    }
 }
 
 fun NavController.navigateToDestinationWithParameter(

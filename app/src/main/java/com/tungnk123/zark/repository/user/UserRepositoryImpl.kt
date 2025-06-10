@@ -1,9 +1,11 @@
 package com.tungnk123.zark.repository.user
 
 import com.tungnk123.zark.data.datasource.user.UserDataSource
+import com.tungnk123.zark.data.dto.user.BaseResponse
 import com.tungnk123.zark.data.dto.user.LoginRequest
 import com.tungnk123.zark.data.dto.user.PaginatedUserResponse
 import com.tungnk123.zark.data.dto.user.SignInRequest
+import com.tungnk123.zark.data.dto.user.UserDto
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
@@ -28,4 +30,7 @@ class UserRepositoryImpl @Inject constructor(
         page,
         pageSize
     )
+
+    override suspend fun getUserById(userId: Int): BaseResponse<UserDto> =
+        userDataSource.getUserById(userId)
 }

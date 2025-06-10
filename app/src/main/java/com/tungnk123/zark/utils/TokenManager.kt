@@ -38,6 +38,7 @@ class TokenManager @Inject constructor(@ApplicationContext private val context: 
     suspend fun clearLoginResponse() {
         context.dataStore.edit { it.remove(TOKEN_KEY) }
         context.dataStore.edit { it.remove(USER_ID) }
+        context.dataStore.edit { it.remove(FCM_TOKEN_KEY) }
     }
 
     suspend fun saveToken(token: String) {

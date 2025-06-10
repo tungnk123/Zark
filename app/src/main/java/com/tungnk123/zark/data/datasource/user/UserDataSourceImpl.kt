@@ -27,4 +27,6 @@ class UserDataSourceImpl @Inject constructor(
         page,
         pageSize
     )
+
+    override suspend fun getUserById(userId: Int) = userService.getUserById(userId)
 }
