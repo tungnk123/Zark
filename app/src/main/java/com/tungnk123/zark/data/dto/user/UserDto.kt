@@ -9,7 +9,7 @@ data class UserDto(
     val email: String,
     val firebaseUid: String?,
     val avatarUrl: String?,
-    val connections: List<String>,
+    val connections: List<UserConnection>,
     val devices: List<String>,
     val isValidAccount: Boolean,
     val publicKey: String?
@@ -28,4 +28,12 @@ data class PaginatedUserResponse(
     val statusCode: Int,
     val data: List<UserDto>,
     val pagination: Pagination
+)
+
+@Serializable
+data class UserConnection(
+    val id: Int,
+    val userId: Int,
+    val connectionId: String,
+    val user: String? = null
 )

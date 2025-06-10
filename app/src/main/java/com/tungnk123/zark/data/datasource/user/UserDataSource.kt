@@ -1,11 +1,13 @@
 package com.tungnk123.zark.data.datasource.user
 
+import com.tungnk123.zark.data.dto.user.BaseResponse
 import com.tungnk123.zark.data.dto.user.FindUserByEmailResponse
 import com.tungnk123.zark.data.dto.user.LoginRequest
 import com.tungnk123.zark.data.dto.user.LoginResponse
 import com.tungnk123.zark.data.dto.user.PaginatedUserResponse
 import com.tungnk123.zark.data.dto.user.SignInRequest
 import com.tungnk123.zark.data.dto.user.SignInResponse
+import com.tungnk123.zark.data.dto.user.UserDto
 
 interface UserDataSource {
     suspend fun registerUser(
@@ -23,4 +25,6 @@ interface UserDataSource {
         page: Int = 1,
         pageSize: Int = 10,
     ): PaginatedUserResponse
+
+    suspend fun getUserById(userId: Int): BaseResponse<UserDto>
 }
