@@ -10,8 +10,6 @@ object AppConstants {
     val navigationTabs = listOf(
         NavigationBarMetadataItem.Home,
         NavigationBarMetadataItem.Calendar,
-        NavigationBarMetadataItem.Workplace,
-        NavigationBarMetadataItem.Document,
         NavigationBarMetadataItem.More,
     )
 }
