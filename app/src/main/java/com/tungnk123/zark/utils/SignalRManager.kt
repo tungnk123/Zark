@@ -10,6 +10,7 @@ import eu.lepicekmichal.signalrkore.TransportEnum
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
@@ -32,7 +33,7 @@ class SignalRManager @Inject constructor(
     private var hubConnection: HubConnection? = null
     private var connectionJob: Job? = null
     private var messageListenerJob: Job? = null
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private var coroutineScope: CoroutineScope? = null
 
     private var onReceiveMessage: ((conversationId: Int, senderId: Int, content: String, type: String, sendDate: String) -> Unit)? =
         null
@@ -42,29 +43,30 @@ class SignalRManager @Inject constructor(
         onError: (Throwable) -> Unit
     ) {
         if (isConnected()) return
+
         val token = tokenManager.token.firstOrNull()
         if (token == null) {
             "Token is null, cannot connect".printLog(TAG)
             return
         }
+
         "Using token: $token".printLog(TAG)
         "HUB_URL: $HUB_URL".printLog(TAG)
 
         val hubUrlWithAccessToken = "$HUB_URL?access_token=$token"
-
         onReceiveMessage = onMessageReceived
+        coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
         hubConnection = HubConnectionBuilder.create(hubUrlWithAccessToken) {
             automaticReconnect = AutomaticReconnect.Active
             transportEnum = TransportEnum.WebSockets
         }
-        "Hub Connection created: $hubConnection".printLog(TAG)
 
+        "Hub Connection created: $hubConnection".printLog(TAG)
         observeConnectionState()
 
         messageListenerJob?.cancel()
-        messageListenerJob = null
-        messageListenerJob = coroutineScope.launch {
+        messageListenerJob = coroutineScope?.launch {
             hubConnection?.on(
                 RECEIVE_MESSAGE,
                 paramType1 = Int::class,
@@ -74,16 +76,19 @@ class SignalRManager @Inject constructor(
                 paramType5 = String::class
             )
                 ?.collect { (conversationId, senderId, content, type, sendDate) ->
-                    "Message received - ConversationId: $conversationId, SenderId: $senderId, Type: $type, SendDate: $sendDate".printLog(
-                        TAG
+                    "Message received - ConversationId: $conversationId, SenderId: $senderId, Type: $type, SendDate: $sendDate".printLog(TAG)
+                    onReceiveMessage?.invoke(
+                        conversationId,
+                        senderId,
+                        content,
+                        type,
+                        sendDate
                     )
-                    onReceiveMessage?.invoke(conversationId, senderId, content, type, sendDate)
                 }
         }
 
         retryUntilConnected(onError)
     }
-
 
     private suspend fun retryUntilConnected(onError: (Throwable) -> Unit) {
         var attempt = 0
@@ -120,7 +125,7 @@ class SignalRManager @Inject constructor(
             return
         }
 
-        coroutineScope.launch {
+        coroutineScope?.launch {
             try {
                 "Sending message to $conversationId: $content".printLog(TAG)
                 hubConnection?.send(SEND_MESSAGE, conversationId, senderId, content, type)
@@ -133,17 +138,23 @@ class SignalRManager @Inject constructor(
     }
 
     suspend fun disconnect() {
-        coroutineScope.cancel()
-        hubConnection?.stop()
+        messageListenerJob?.cancel()
         connectionJob?.cancel()
+        hubConnection?.stop()
+        coroutineScope?.cancel()
+
         hubConnection = null
+        messageListenerJob = null
+        connectionJob = null
+        coroutineScope = null
+        onReceiveMessage = null
     }
 
     fun isConnected(): Boolean =
         hubConnection?.connectionState?.value == HubConnectionState.CONNECTED
 
     private fun observeConnectionState() {
-        coroutineScope.launch {
+        coroutineScope?.launch {
             hubConnection?.connectionState?.collect { state ->
                 when (state) {
                     HubConnectionState.CONNECTED -> "Connected to SignalR".printLog(TAG)

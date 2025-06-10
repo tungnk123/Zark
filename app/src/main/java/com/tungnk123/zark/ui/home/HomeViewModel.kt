@@ -31,20 +31,21 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
+            try {
+                val contacts = conversationRepository.getConversations()
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false, contacts = contacts, error = null
+                )
+            }
+            catch (e: Exception) {
+                e.printException(TAG)
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false, error = e.message
+                )
+            }
+            delay(AppConstants.DELAY_POLLING_CONTACT)
             while (isActive) {
-                try {
-                    val contacts = conversationRepository.getConversations()
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false, contacts = contacts, error = null
-                    )
-                }
-                catch (e: Exception) {
-                    e.printException(TAG)
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false, error = e.message
-                    )
-                }
-                delay(AppConstants.DELAY_POLLING_CONTACT)
+
             }
         }
     }

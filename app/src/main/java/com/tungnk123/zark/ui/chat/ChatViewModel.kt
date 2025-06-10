@@ -154,7 +154,7 @@ class ChatViewModel @Inject constructor(
 
                 val response = scheduleRepository.processText(request)
 
-                val matchedMessage = _uiState.value.incomingMessages
+                val matchedMessage = (_uiState.value.chatList + _uiState.value.incomingMessages)
                     .lastOrNull { it.message == text }
 
                 updateState {

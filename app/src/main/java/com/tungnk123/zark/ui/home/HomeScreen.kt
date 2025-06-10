@@ -33,12 +33,14 @@ fun HomeScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
     homeViewModel: HomeViewModel = hiltViewModel(),
+    chatViewModel: ChatViewModel = hiltViewModel()
 ) {
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         homeViewModel.fetchConversations()
+        chatViewModel.startConnection()
     }
 
     LaunchedEffect(uiState.error) {
