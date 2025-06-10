@@ -17,6 +17,12 @@ import javax.crypto.spec.SecretKeySpec
 import javax.inject.Inject
 import javax.inject.Singleton
 
+const val TAG = "E2EEManager"
+
+fun String.printLog(tag: String = TAG) {
+    println("[$tag] $this")
+}
+
 @Singleton
 class E2EEManager @Inject constructor() {
     private val userKeys = ConcurrentHashMap<Int, UserKeyPair>()
@@ -38,7 +44,7 @@ class E2EEManager @Inject constructor() {
         val publicKeyBase64 = Base64.getEncoder()
             .encodeToString(keyPair.public.encoded)
         userPublicKeys[userId] = publicKeyBase64
-        println("✅ User $userId registered successfully")
+        "✅ User $userId registered successfully".printLog()
         return userKeyPair
     }
 
@@ -62,12 +68,11 @@ class E2EEManager @Inject constructor() {
             participants
         )
         sessions[sessionId] = sessionInfo
-        val chatSession = ChatSession(
+        chatSessions[sessionId] = ChatSession(
             sessionId,
             participants
         )
-        chatSessions[sessionId] = chatSession
-        println("🔐 Chat session created: $sessionId with participants: $participants")
+        "🔐 Chat session created: $sessionId with participants: $participants".printLog()
         return sessionId
     }
 
@@ -83,7 +88,12 @@ class E2EEManager @Inject constructor() {
     ): String {
         val session =
             sessions[sessionId] ?: throw IllegalArgumentException("Session $sessionId not found")
-        if (!session.participants.contains(senderId) || !session.participants.contains(recipientId)) {
+        if (!session.participants.containsAll(
+                listOf(
+                    senderId,
+                    recipientId
+                )
+            )) {
             throw IllegalArgumentException("Sender or recipient not in session")
         }
         val iv = generateIV()
@@ -94,17 +104,17 @@ class E2EEManager @Inject constructor() {
         )
         val messageId = generateMessageId()
         val encryptedMessage = EncryptedMessage(
-            messageId = messageId,
-            senderId = senderId,
-            recipientId = recipientId,
-            sessionId = sessionId,
-            encryptedContent = encryptedContent,
-            iv = Base64.getEncoder()
+            messageId,
+            senderId,
+            recipientId,
+            sessionId,
+            encryptedContent,
+            Base64.getEncoder()
                 .encodeToString(iv)
         )
         chatSessions[sessionId]?.messages?.add(encryptedMessage)
         sessions[sessionId] = session.copy(lastUsed = LocalDateTime.now())
-        println("📤 Message sent from User $senderId to User $recipientId in session $sessionId")
+        "📤 Message sent from User $senderId to User $recipientId in session $sessionId".printLog()
         return messageId
     }
 
@@ -128,7 +138,7 @@ class E2EEManager @Inject constructor() {
             session.sessionKey,
             iv
         )
-        println("📥 Message received by User $recipientId from User ${message.senderId}")
+        "📥 Message received by User $recipientId from User ${message.senderId}".printLog()
         return decryptedMessage
     }
 
@@ -191,7 +201,7 @@ class E2EEManager @Inject constructor() {
     fun closeSession(sessionId: String) {
         sessions.remove(sessionId)
         chatSessions.remove(sessionId)
-        println("🔒 Session $sessionId closed and cleaned up")
+        "🔒 Session $sessionId closed and cleaned up".printLog()
     }
 
     fun cleanupOldSessions(hoursOld: Long = 24) {
@@ -202,7 +212,7 @@ class E2EEManager @Inject constructor() {
             sessions.remove(sessionId)
             chatSessions.remove(sessionId)
         }
-        println("🧹 Cleaned up ${oldSessions.size} old sessions")
+        "🧹 Cleaned up ${oldSessions.size} old sessions".printLog()
     }
 
     private fun generateKeyPair(): KeyPair {
