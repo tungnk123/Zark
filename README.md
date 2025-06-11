@@ -5,6 +5,7 @@ Zark is a comprehensive messaging and scheduling platform built for Android usin
 
 ![image](https://github.com/user-attachments/assets/b308596e-5262-4568-8e07-619fa9617591)
 
+https://deepwiki.com/tungnk123/Zark
 ---
 
 ## Core Features
