@@ -35,7 +35,7 @@ android {
         }
     }
     val chatHost = "https://zarkchat-fvfgfuhactbbc2bv.southeastasia-01.azurewebsites.net/"
-    val scheduleHost = "https://zarkchat-fastapi.azurewebsites.net/"
+    val scheduleHost = "https://fastapi-phobert-ner.onrender.com"
     flavorDimensions.add("default")
     productFlavors {
         val properties = Properties()
