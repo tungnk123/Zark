@@ -83,7 +83,6 @@ fun SearchScreen(
     ) { contentPaddings ->
 
         when {
-            // Loading state
             uiState.isLoading -> {
                 Box(
                     modifier = Modifier
@@ -97,7 +96,6 @@ fun SearchScreen(
                 }
             }
 
-            // Empty query state
             query.isBlank() -> {
                 Box(
                     modifier = Modifier
@@ -115,7 +113,6 @@ fun SearchScreen(
                 }
             }
 
-            // No results state
             uiState.searchContacts.isEmpty() && uiState.searchUsers.isEmpty() -> {
                 EmptySearchItem(
                     content = stringResource(
@@ -128,7 +125,6 @@ fun SearchScreen(
                 )
             }
 
-            // Results state
             else -> {
                 LazyColumn(
                     modifier = Modifier
@@ -136,7 +132,6 @@ fun SearchScreen(
                         .padding(contentPaddings)
                         .padding(horizontal = 16.dp),
                 ) {
-                    // Search results summary
                     item {
                         val totalResults = uiState.searchContacts.size + uiState.searchUsers.size
                         Text(
@@ -151,7 +146,6 @@ fun SearchScreen(
                         )
                     }
 
-                    // Conversations section
                     if (uiState.searchContacts.isNotEmpty()) {
                         item {
                             Text(
@@ -182,7 +176,6 @@ fun SearchScreen(
                         }
                     }
 
-                    // Divider between sections
                     if (uiState.searchContacts.isNotEmpty() && uiState.searchUsers.isNotEmpty()) {
                         item {
                             Spacer(modifier = Modifier.height(8.dp))
@@ -194,7 +187,6 @@ fun SearchScreen(
                         }
                     }
 
-                    // Users section
                     if (uiState.searchUsers.isNotEmpty()) {
                         item {
                             Text(
@@ -213,7 +205,6 @@ fun SearchScreen(
                                 user = user,
                                 onUserClick = {
                                     try {
-                                        // Handle user click - you can implement these methods
                                         handleUserClick(
                                             user,
                                             navController,
@@ -230,7 +221,6 @@ fun SearchScreen(
                         }
                     }
 
-                    // Bottom spacing
                     item {
                         Spacer(modifier = Modifier.height(16.dp))
                     }
